@@ -233,10 +233,14 @@ function Header() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Hero Section
+   Hero Section  (with cinematic background video)
 ───────────────────────────────────────────────────────────────────────────── */
 function HeroSection() {
   const [typedText, setTypedText] = useState("");
+  const [muted, setMuted] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const phrases = [
     "every API call.",
     "every token you send.",
@@ -248,6 +252,7 @@ function HeroSection() {
   const charIndex = useRef(0);
   const deleting = useRef(false);
 
+  /* Typewriter */
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     const type = () => {
@@ -275,47 +280,104 @@ function HeroSection() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
-    <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden px-4 text-center">
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setMuted(videoRef.current.muted);
+    }
+  };
 
-      {/* Background glows */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px] animate-float-slow" />
-        <div className="absolute bottom-[-5%] left-1/4 w-[500px] h-[400px] rounded-full bg-violet-600/8 blur-[100px]" style={{ animation: "float-slow 12s ease-in-out infinite 2s" }} />
-        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px] animate-float" />
-      </div>
+  return (
+    <section className="relative min-h-[96vh] flex flex-col items-center justify-center overflow-hidden px-4 text-center">
+
+      {/* ── Cinematic background video ── */}
+      {!videoError && (
+        <div className="absolute inset-0 z-0">
+          <video
+            ref={videoRef}
+            autoPlay
+            loop
+            muted
+            playsInline
+            onError={() => setVideoError(true)}
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{ filter: "brightness(0.22) saturate(1.4)" }}
+          >
+            <source src="/hero-bg.mp4" type="video/mp4" />
+          </video>
+
+          {/* Dark vignette overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-slate-950/30 to-slate-950/80" />
+          {/* Side vignettes */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-transparent to-slate-950/70" />
+          {/* Purple tint layer */}
+          <div className="absolute inset-0 bg-indigo-950/20" />
+
+          {/* Mute / unmute control */}
+          <button
+            onClick={toggleMute}
+            title={muted ? "Unmute video" : "Mute video"}
+            className="absolute bottom-6 right-6 z-20 flex items-center gap-1.5 rounded-full border border-white/10 bg-slate-900/60 backdrop-blur px-3 py-1.5 text-xs text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all"
+          >
+            {muted ? (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+                </svg>
+                Unmute
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                </svg>
+                Mute
+              </>
+            )}
+          </button>
+        </div>
+      )}
+
+      {/* Fallback: CSS glows when video fails */}
+      {videoError && (
+        <div className="pointer-events-none absolute inset-0 z-0">
+          <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px] animate-float-slow" />
+          <div className="absolute bottom-[-5%] left-1/4 w-[500px] h-[400px] rounded-full bg-violet-600/8 blur-[100px]" />
+          <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px] animate-float" />
+        </div>
+      )}
 
       {/* Floating code snippets — decorative */}
-      <div className="pointer-events-none absolute left-8 top-1/4 hidden xl:block animate-float opacity-30" style={{ animationDelay: "1s" }}>
-        <pre className="text-[11px] text-indigo-400 font-mono border border-indigo-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+      <div className="pointer-events-none absolute left-8 top-1/4 hidden xl:block animate-float opacity-40 z-10" style={{ animationDelay: "1s" }}>
+        <pre className="text-[11px] text-indigo-300 font-mono border border-indigo-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
 {`const cost = tokens * price_per_1m
 // $0.0024 per call`}
         </pre>
       </div>
-      <div className="pointer-events-none absolute right-8 top-1/3 hidden xl:block animate-float opacity-30" style={{ animationDelay: "3s" }}>
-        <pre className="text-[11px] text-emerald-400 font-mono border border-emerald-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+      <div className="pointer-events-none absolute right-8 top-1/3 hidden xl:block animate-float opacity-40 z-10" style={{ animationDelay: "3s" }}>
+        <pre className="text-[11px] text-emerald-300 font-mono border border-emerald-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
 {`CO₂e: 0.42g per request
 Water: 12ml consumed`}
         </pre>
       </div>
-      <div className="pointer-events-none absolute right-12 bottom-1/3 hidden xl:block animate-float opacity-25" style={{ animationDelay: "2s" }}>
-        <pre className="text-[11px] text-cyan-400 font-mono border border-cyan-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+      <div className="pointer-events-none absolute right-12 bottom-1/3 hidden xl:block animate-float opacity-35 z-10" style={{ animationDelay: "2s" }}>
+        <pre className="text-[11px] text-cyan-300 font-mono border border-cyan-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
 {`GPT-4o    $2.50/1M
 Claude 3.5 $3.00/1M
 Gemini 1.5 $1.25/1M`}
         </pre>
       </div>
 
-      {/* Main content */}
+      {/* ── Main content ── */}
       <div className="relative z-10 max-w-4xl mx-auto">
         {/* Pill */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs text-indigo-300 font-medium mb-8 animate-pulse-glow">
+        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/40 bg-indigo-500/15 backdrop-blur px-4 py-1.5 text-xs text-indigo-200 font-medium mb-8 animate-pulse-glow">
           <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
           Infrastructure-aware LLM benchmarking · Powered by Gemini AI
         </div>
 
         {/* Headline */}
-        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6">
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6 drop-shadow-2xl">
           <span className="gradient-text-hero block">Know the true cost of</span>
           <span className="text-white block mt-2 min-h-[1.2em]">
             <span className="gradient-text-accent cursor-blink">{typedText}</span>
@@ -323,13 +385,13 @@ Gemini 1.5 $1.25/1M`}
         </h1>
 
         {/* Sub */}
-        <p className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10">
+        <p className="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto mb-10 drop-shadow">
           Compare GPT-4o, Claude 3.5, Gemini 1.5 and more — side-by-side on{" "}
-          <span className="text-slate-200 font-semibold">cost</span>,{" "}
-          <span className="text-slate-200 font-semibold">latency</span>,{" "}
-          <span className="text-emerald-400 font-semibold">carbon</span>,{" "}
-          <span className="text-cyan-400 font-semibold">water</span>, and{" "}
-          <span className="text-violet-400 font-semibold">energy</span>.{" "}
+          <span className="text-white font-semibold">cost</span>,{" "}
+          <span className="text-white font-semibold">latency</span>,{" "}
+          <span className="text-emerald-300 font-semibold">carbon</span>,{" "}
+          <span className="text-cyan-300 font-semibold">water</span>, and{" "}
+          <span className="text-violet-300 font-semibold">energy</span>.{" "}
           Instantly. Privately. Free.
         </p>
 
@@ -338,7 +400,7 @@ Gemini 1.5 $1.25/1M`}
           <a href="#calculator">
             <Button
               size="lg"
-              className="step-badge text-white font-semibold text-base px-8 py-3 h-auto rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
+              className="step-badge text-white font-semibold text-base px-8 py-3 h-auto rounded-xl hover:opacity-90 transition-opacity shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50"
             >
               ⚡ Try the Calculator
             </Button>
@@ -347,7 +409,7 @@ Gemini 1.5 $1.25/1M`}
             <Button
               variant="outline"
               size="lg"
-              className="border-slate-700 text-slate-300 hover:border-indigo-500 hover:text-white font-semibold text-base px-8 py-3 h-auto rounded-xl transition-all bg-slate-900/50"
+              className="border-white/20 text-white hover:border-indigo-400 hover:text-white font-semibold text-base px-8 py-3 h-auto rounded-xl transition-all bg-slate-900/40 backdrop-blur"
             >
               See how it works →
             </Button>
@@ -355,7 +417,7 @@ Gemini 1.5 $1.25/1M`}
         </div>
 
         {/* Trust signals */}
-        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500">
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-400">
           {[
             { icon: "🛡️", label: "100% client-side" },
             { icon: "🔓", label: "Open source" },
@@ -363,7 +425,7 @@ Gemini 1.5 $1.25/1M`}
             { icon: "📊", label: "6 metrics tracked" },
             { icon: "📄", label: "PDF reports" },
           ].map(({ icon, label }) => (
-            <div key={label} className="flex items-center gap-1.5">
+            <div key={label} className="flex items-center gap-1.5 drop-shadow">
               <span>{icon}</span>
               <span>{label}</span>
             </div>
