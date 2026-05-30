@@ -24,8 +24,8 @@ import {
   Check,
   FileText,
   Brain,
-  ArrowRight,
   TrendingDown,
+  Activity,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
