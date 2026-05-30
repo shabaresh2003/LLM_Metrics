@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
+import { Button } from "@/components/ui/button";
 import {
   CalculatorView,
   DEFAULT_SELECTED,
@@ -34,19 +35,64 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Scroll-reveal hook
+───────────────────────────────────────────────────────────────────────────── */
+function useScrollReveal() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+    );
+    const elements = document.querySelectorAll(
+      ".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right"
+    );
+    elements.forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Animated counter hook
+───────────────────────────────────────────────────────────────────────────── */
+function useCounter(target: number, duration = 1800, start = false) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setValue(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [start, target, duration]);
+  return value;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Root Page Component
+───────────────────────────────────────────────────────────────────────────── */
 function Index() {
-  // App-level state lifted so tabs share data.
   const [systemPrompt, setSystemPrompt] = useState(
-    "You are a helpful assistant. Answer concisely.",
+    "You are a helpful assistant. Answer concisely."
   );
   const [userPrompt, setUserPrompt] = useState(
-    "Summarize the key risks of deploying large language models in production.",
+    "Summarize the key risks of deploying large language models in production."
   );
   const [outputTokens, setOutputTokens] = useState(256);
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_SELECTED);
   const [callsPerMonth, setCallsPerMonth] = useState(10000);
 
-  // Gemini API Key state saved to localStorage
   const [geminiApiKey, setGeminiApiKey] = useState(() => {
     if (typeof window !== "undefined") {
       return localStorage.getItem("gemini_api_key") || "AIzaSyDb1xKbZVh_JnE1prYT3m8Keo8SHAOcdYk";
@@ -61,14 +107,41 @@ function Index() {
     }
   };
 
+  useScrollReveal();
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white relative overflow-hidden bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(99,102,241,0.15),rgba(255,255,255,0))]">
+    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white overflow-x-hidden">
       <Toaster richColors position="top-right" />
       <Header />
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <Hero />
+
+      {/* ── Hero ── */}
+      <HeroSection />
+
+      {/* ── User Journey / Storytelling ── */}
+      <UserJourneySection />
+
+      {/* ── Feature Showcase ── */}
+      <FeatureShowcaseSection />
+
+      {/* ── Live Stats ── */}
+      <LiveStatsSection />
+
+      {/* ── Calculator (anchor target) ── */}
+      <section id="calculator" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="text-center mb-10 scroll-reveal">
+          <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs text-indigo-400 font-medium mb-4">
+            ⚡ Live Calculator
+          </div>
+          <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl mb-3">
+            Try it for yourself
+          </h2>
+          <p className="text-slate-400 max-w-xl mx-auto text-sm">
+            Paste your prompt and instantly see cost, carbon, water, and energy across every major LLM.
+          </p>
+        </div>
+
         <Tabs defaultValue="calculator" className="mt-8">
-          <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-900 border border-slate-800 p-1 rounded-lg">
+          <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-900 border border-slate-800 p-1 rounded-lg mx-auto">
             <TabsTrigger value="calculator" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Calculator</TabsTrigger>
             <TabsTrigger value="reports" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Reports</TabsTrigger>
             <TabsTrigger value="settings" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Settings</TabsTrigger>
@@ -92,61 +165,572 @@ function Index() {
             <ReportsTab />
           </TabsContent>
           <TabsContent value="settings" className="mt-6">
-            <SettingsTab
-              geminiApiKey={geminiApiKey}
-              updateGeminiApiKey={updateGeminiApiKey}
-            />
+            <SettingsTab geminiApiKey={geminiApiKey} updateGeminiApiKey={updateGeminiApiKey} />
           </TabsContent>
         </Tabs>
+      </section>
 
-        <PrivacyBadge />
-      </main>
+      <EnhancedFooter />
     </div>
   );
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Header
+───────────────────────────────────────────────────────────────────────────── */
 function Header() {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-slate-800/80 bg-slate-950/90 backdrop-blur shadow-lg shadow-slate-950/50"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white font-mono text-base font-bold shadow-md shadow-indigo-500/20">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg step-badge text-white font-mono text-base font-bold">
             T
           </div>
           <div>
-            <div className="text-base font-bold tracking-tight text-white flex items-center gap-1.5">
-              TokenMetrics.ai
+            <div className="text-base font-bold tracking-tight text-white">
+              TokenMetrics<span className="text-indigo-400">.ai</span>
             </div>
-            <div className="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">
-              LLM Cost · Performance · Carbon
+            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
+              LLM Cost · Carbon · Intelligence
             </div>
           </div>
         </div>
-        <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 font-medium">
-          v1.1 · {MODELS.length} models
-        </Badge>
+
+        {/* Nav */}
+        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-400">
+          <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
+          <a href="#features" className="hover:text-white transition-colors">Features</a>
+          <a href="#calculator" className="hover:text-white transition-colors">Calculator</a>
+        </nav>
+
+        {/* Right badges */}
+        <div className="flex items-center gap-3">
+          <Badge variant="outline" className="hidden sm:flex border-emerald-500/30 text-emerald-400 font-medium text-xs">
+            🛡️ Privacy-first
+          </Badge>
+          <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 font-medium text-xs">
+            v1.1 · {MODELS.length} models
+          </Badge>
+        </div>
       </div>
     </header>
   );
 }
 
-function Hero() {
+/* ─────────────────────────────────────────────────────────────────────────────
+   Hero Section
+───────────────────────────────────────────────────────────────────────────── */
+function HeroSection() {
+  const [typedText, setTypedText] = useState("");
+  const phrases = [
+    "every API call.",
+    "every token you send.",
+    "every model you choose.",
+    "your LLM carbon footprint.",
+    "your AI water usage.",
+  ];
+  const phraseIndex = useRef(0);
+  const charIndex = useRef(0);
+  const deleting = useRef(false);
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>;
+    const type = () => {
+      const current = phrases[phraseIndex.current];
+      if (!deleting.current) {
+        setTypedText(current.slice(0, charIndex.current + 1));
+        charIndex.current++;
+        if (charIndex.current === current.length) {
+          deleting.current = true;
+          timeout = setTimeout(type, 2000);
+          return;
+        }
+      } else {
+        setTypedText(current.slice(0, charIndex.current - 1));
+        charIndex.current--;
+        if (charIndex.current === 0) {
+          deleting.current = false;
+          phraseIndex.current = (phraseIndex.current + 1) % phrases.length;
+        }
+      }
+      timeout = setTimeout(type, deleting.current ? 40 : 65);
+    };
+    timeout = setTimeout(type, 600);
+    return () => clearTimeout(timeout);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <section className="space-y-4 py-6">
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs text-indigo-400 font-medium">
-        <span>⚡ Infrastructure-aware benchmarking</span>
+    <section className="relative min-h-[92vh] flex flex-col items-center justify-center overflow-hidden px-4 text-center">
+
+      {/* Background glows */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-[-10%] left-1/2 -translate-x-1/2 w-[900px] h-[600px] rounded-full bg-indigo-600/10 blur-[120px] animate-float-slow" />
+        <div className="absolute bottom-[-5%] left-1/4 w-[500px] h-[400px] rounded-full bg-violet-600/8 blur-[100px]" style={{ animation: "float-slow 12s ease-in-out infinite 2s" }} />
+        <div className="absolute top-1/3 right-1/4 w-[300px] h-[300px] rounded-full bg-cyan-500/5 blur-[80px] animate-float" />
       </div>
-      <h1 className="text-3xl font-extrabold tracking-tight sm:text-4xl bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent">
-        The LLM Economics & Carbon Calculator
-      </h1>
-      <p className="max-w-3xl text-sm sm:text-base text-slate-400 leading-relaxed">
-        Make data-driven decisions by benchmarking GPT, Claude, and Gemini side-by-side. 
-        Evaluate financial cost, latency, energy usage, water consumption, and CO₂e emissions for any prompt instantly.
-      </p>
+
+      {/* Floating code snippets — decorative */}
+      <div className="pointer-events-none absolute left-8 top-1/4 hidden xl:block animate-float opacity-30" style={{ animationDelay: "1s" }}>
+        <pre className="text-[11px] text-indigo-400 font-mono border border-indigo-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+{`const cost = tokens * price_per_1m
+// $0.0024 per call`}
+        </pre>
+      </div>
+      <div className="pointer-events-none absolute right-8 top-1/3 hidden xl:block animate-float opacity-30" style={{ animationDelay: "3s" }}>
+        <pre className="text-[11px] text-emerald-400 font-mono border border-emerald-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+{`CO₂e: 0.42g per request
+Water: 12ml consumed`}
+        </pre>
+      </div>
+      <div className="pointer-events-none absolute right-12 bottom-1/3 hidden xl:block animate-float opacity-25" style={{ animationDelay: "2s" }}>
+        <pre className="text-[11px] text-cyan-400 font-mono border border-cyan-500/20 rounded-lg px-3 py-2 bg-slate-900/60">
+{`GPT-4o    $2.50/1M
+Claude 3.5 $3.00/1M
+Gemini 1.5 $1.25/1M`}
+        </pre>
+      </div>
+
+      {/* Main content */}
+      <div className="relative z-10 max-w-4xl mx-auto">
+        {/* Pill */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-4 py-1.5 text-xs text-indigo-300 font-medium mb-8 animate-pulse-glow">
+          <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
+          Infrastructure-aware LLM benchmarking · Powered by Gemini AI
+        </div>
+
+        {/* Headline */}
+        <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] mb-6">
+          <span className="gradient-text-hero block">Know the true cost of</span>
+          <span className="text-white block mt-2 min-h-[1.2em]">
+            <span className="gradient-text-accent cursor-blink">{typedText}</span>
+          </span>
+        </h1>
+
+        {/* Sub */}
+        <p className="text-lg sm:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto mb-10">
+          Compare GPT-4o, Claude 3.5, Gemini 1.5 and more — side-by-side on{" "}
+          <span className="text-slate-200 font-semibold">cost</span>,{" "}
+          <span className="text-slate-200 font-semibold">latency</span>,{" "}
+          <span className="text-emerald-400 font-semibold">carbon</span>,{" "}
+          <span className="text-cyan-400 font-semibold">water</span>, and{" "}
+          <span className="text-violet-400 font-semibold">energy</span>.{" "}
+          Instantly. Privately. Free.
+        </p>
+
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row items-center gap-4 justify-center mb-14">
+          <a href="#calculator">
+            <Button
+              size="lg"
+              className="step-badge text-white font-semibold text-base px-8 py-3 h-auto rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40"
+            >
+              ⚡ Try the Calculator
+            </Button>
+          </a>
+          <a href="#how-it-works">
+            <Button
+              variant="outline"
+              size="lg"
+              className="border-slate-700 text-slate-300 hover:border-indigo-500 hover:text-white font-semibold text-base px-8 py-3 h-auto rounded-xl transition-all bg-slate-900/50"
+            >
+              See how it works →
+            </Button>
+          </a>
+        </div>
+
+        {/* Trust signals */}
+        <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-slate-500">
+          {[
+            { icon: "🛡️", label: "100% client-side" },
+            { icon: "🔓", label: "Open source" },
+            { icon: "🤖", label: `${MODELS.length}+ LLM models` },
+            { icon: "📊", label: "6 metrics tracked" },
+            { icon: "📄", label: "PDF reports" },
+          ].map(({ icon, label }) => (
+            <div key={label} className="flex items-center gap-1.5">
+              <span>{icon}</span>
+              <span>{label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Scroll indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-600 animate-bounce">
+        <span className="text-xs">scroll</span>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      </div>
     </section>
   );
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   User Journey / Storytelling Section
+───────────────────────────────────────────────────────────────────────────── */
+const JOURNEY_STEPS = [
+  {
+    number: "01",
+    emoji: "✍️",
+    title: "Enter your prompt",
+    subtitle: "Your words. Your use case.",
+    description:
+      "Paste your system prompt and user message — exactly as you'd call the API. No sign-up, no data sent to any server. Everything stays in your browser.",
+    code: `system: "You are a helpful assistant."
+user: "Summarize key risks of LLMs in prod."`,
+    codeColor: "text-indigo-300",
+    codeBorder: "border-indigo-500/20",
+    accent: "from-indigo-500 to-violet-500",
+    glowColor: "rgba(99,102,241,0.15)",
+  },
+  {
+    number: "02",
+    emoji: "🔢",
+    title: "We tokenize & count",
+    subtitle: "Precise token counting, client-side.",
+    description:
+      "Using the same tiktoken library as OpenAI, we measure your exact input and estimated output token count. No approximations. No black boxes.",
+    code: `Input tokens:   87
+Output tokens: 256
+Total:         343 tokens`,
+    codeColor: "text-cyan-300",
+    codeBorder: "border-cyan-500/20",
+    accent: "from-cyan-500 to-blue-500",
+    glowColor: "rgba(6,182,212,0.12)",
+  },
+  {
+    number: "03",
+    emoji: "⚖️",
+    title: "Compare 10+ models side-by-side",
+    subtitle: "Apples-to-apples. No spin.",
+    description:
+      "GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro and more — ranked by cost, latency, energy, water, and CO₂ emissions. All calculated at your actual scale.",
+    code: `GPT-4o        $0.0024  ⚡ 1.2s
+Claude 3.5    $0.0029  ⚡ 0.9s
+Gemini 1.5    $0.0012  ⚡ 1.4s`,
+    codeColor: "text-emerald-300",
+    codeBorder: "border-emerald-500/20",
+    accent: "from-emerald-500 to-teal-500",
+    glowColor: "rgba(16,185,129,0.12)",
+  },
+  {
+    number: "04",
+    emoji: "📊",
+    title: "Get your AI-powered report",
+    subtitle: "Data + story + recommendations.",
+    description:
+      "Gemini AI advisor generates relatable insights — \"This month's LLM spend equals 5 developer salaries\" — plus actionable optimization recommendations and a downloadable PDF.",
+    code: `💡 Switching to Gemini Flash
+   saves $847/mo at your scale.
+💧 Water: 120L = 2 bathtubs.`,
+    codeColor: "text-violet-300",
+    codeBorder: "border-violet-500/20",
+    accent: "from-violet-500 to-pink-500",
+    glowColor: "rgba(139,92,246,0.15)",
+  },
+];
+
+function UserJourneySection() {
+  return (
+    <section id="how-it-works" className="relative py-24 px-4">
+      {/* Section heading */}
+      <div className="text-center mb-16 scroll-reveal">
+        <div className="inline-flex items-center gap-2 rounded-full border border-violet-500/30 bg-violet-500/10 px-4 py-1.5 text-xs text-violet-300 font-medium mb-4">
+          🗺️ Your journey
+        </div>
+        <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+          From prompt to insight
+          <br />
+          <span className="gradient-text-accent">in under 3 seconds</span>
+        </h2>
+        <p className="text-slate-400 max-w-xl mx-auto">
+          Here's exactly how TokenMetrics.ai transforms a raw API call into a clear, actionable intelligence report.
+        </p>
+      </div>
+
+      {/* Steps */}
+      <div className="max-w-5xl mx-auto space-y-6">
+        {JOURNEY_STEPS.map((step, i) => (
+          <JourneyStep key={step.number} step={step} index={i} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function JourneyStep({
+  step,
+  index,
+}: {
+  step: (typeof JOURNEY_STEPS)[0];
+  index: number;
+}) {
+  const isEven = index % 2 === 0;
+  const revealClass = isEven ? "scroll-reveal-left" : "scroll-reveal-right";
+
+  return (
+    <div
+      className={`${revealClass} glass-card rounded-2xl p-6 sm:p-8 relative overflow-hidden transition-all duration-300 hover:border-white/15 hover:scale-[1.01]`}
+      style={{ transitionDelay: `${index * 80}ms` }}
+    >
+      {/* Background glow */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at ${isEven ? "top left" : "top right"}, ${step.glowColor} 0%, transparent 60%)`,
+        }}
+      />
+
+      <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
+        {/* Step badge */}
+        <div className="shrink-0">
+          <div className={`step-badge text-white text-2xl rounded-2xl flex flex-col items-center justify-center w-16 h-16 font-black bg-gradient-to-br ${step.accent} shadow-lg`}>
+            {step.emoji}
+          </div>
+          <div className="text-center mt-2 font-mono text-xs font-bold text-slate-600">{step.number}</div>
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 min-w-0">
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{step.subtitle}</div>
+          <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">{step.title}</h3>
+          <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-4">{step.description}</p>
+
+          {/* Code preview */}
+          <div className={`rounded-xl border ${step.codeBorder} bg-slate-950/60 px-4 py-3`}>
+            <pre className={`text-xs sm:text-sm font-mono ${step.codeColor} whitespace-pre-wrap leading-relaxed`}>
+              {step.code}
+            </pre>
+          </div>
+        </div>
+
+        {/* Step number watermark */}
+        <div className="hidden lg:block absolute right-6 top-6 font-black text-7xl text-white/[0.025] select-none leading-none">
+          {step.number}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Feature Showcase Section
+───────────────────────────────────────────────────────────────────────────── */
+const FEATURES = [
+  {
+    icon: "💰",
+    title: "Cost Intelligence",
+    description:
+      "See exactly what each model charges per million tokens — input, output, and cache reads. Then project that to your actual monthly call volume. No surprises at the billing cycle.",
+    highlight: "Up to 60% cheaper alternatives surfaced",
+    accent: "from-yellow-500/20 to-orange-500/10",
+    border: "hover:border-yellow-500/40",
+    tag: "Financial",
+    tagColor: "text-yellow-400 border-yellow-400/30 bg-yellow-400/10",
+  },
+  {
+    icon: "🌍",
+    title: "Environmental Impact",
+    description:
+      "Track water consumption, energy usage, and CO₂ emissions per request — then contextualize them with relatable real-world facts powered by Gemini AI. Not just numbers — stories.",
+    highlight: "6 environmental metrics in one view",
+    accent: "from-emerald-500/20 to-teal-500/10",
+    border: "hover:border-emerald-500/40",
+    tag: "Sustainability",
+    tagColor: "text-emerald-400 border-emerald-400/30 bg-emerald-400/10",
+  },
+  {
+    icon: "🤖",
+    title: "AI-Powered Advisor",
+    description:
+      "Gemini 2.5 Flash analyzes your metrics and generates personalized recommendations — \"Switch to Claude Haiku for simple tasks and save $800/mo\" — not generic advice, your advice.",
+    highlight: "Personalized optimization recommendations",
+    accent: "from-violet-500/20 to-indigo-500/10",
+    border: "hover:border-violet-500/40",
+    tag: "AI Insights",
+    tagColor: "text-violet-400 border-violet-400/30 bg-violet-400/10",
+  },
+  {
+    icon: "⚡",
+    title: "Instant Tokenization",
+    description:
+      "Client-side tiktoken counts your exact tokens using the same algorithm as OpenAI — before you even hit the API. Catch oversize prompts before they cost you.",
+    highlight: "Zero latency, zero server calls",
+    accent: "from-cyan-500/20 to-blue-500/10",
+    border: "hover:border-cyan-500/40",
+    tag: "Performance",
+    tagColor: "text-cyan-400 border-cyan-400/30 bg-cyan-400/10",
+  },
+  {
+    icon: "📊",
+    title: "Visual Benchmarks",
+    description:
+      "Interactive bar and scatter charts let you instantly spot which model sits at the sweet spot of price vs performance. Filter, zoom, compare — all live in the browser.",
+    highlight: "Side-by-side visual comparison",
+    accent: "from-blue-500/20 to-indigo-500/10",
+    border: "hover:border-blue-500/40",
+    tag: "Visualization",
+    tagColor: "text-blue-400 border-blue-400/30 bg-blue-400/10",
+  },
+  {
+    icon: "📄",
+    title: "Downloadable PDF Reports",
+    description:
+      "Generate a clean, formatted report with your comparison results, relatable facts, and AI recommendations. Share it with your team, your manager, or your investors.",
+    highlight: "One-click export, no watermarks",
+    accent: "from-pink-500/20 to-rose-500/10",
+    border: "hover:border-pink-500/40",
+    tag: "Reports",
+    tagColor: "text-pink-400 border-pink-400/30 bg-pink-400/10",
+  },
+];
+
+function FeatureShowcaseSection() {
+  return (
+    <section id="features" className="py-24 px-4 relative">
+      {/* Background */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] rounded-full bg-indigo-900/10 blur-[120px]" />
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
+        <div className="text-center mb-16 scroll-reveal">
+          <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs text-cyan-300 font-medium mb-4">
+            ✨ Everything you need
+          </div>
+          <h2 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
+            Built for teams who care about
+            <br />
+            <span className="gradient-text-hero">precision and cost</span>
+          </h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Six powerful tools in one dashboard — no subscriptions, no logins, no tracking. Just data.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {FEATURES.map((feat, i) => (
+            <div
+              key={feat.title}
+              className={`scroll-reveal glass-card rounded-2xl p-6 relative overflow-hidden transition-all duration-300 ${feat.border} hover:scale-[1.02] cursor-default`}
+              style={{ transitionDelay: `${i * 60}ms` }}
+            >
+              {/* Card background */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${feat.accent} pointer-events-none`} />
+
+              <div className="relative z-10">
+                {/* Icon + tag */}
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-3xl">{feat.icon}</span>
+                  <Badge variant="outline" className={`text-xs ${feat.tagColor}`}>
+                    {feat.tag}
+                  </Badge>
+                </div>
+
+                {/* Title + desc */}
+                <h3 className="text-lg font-bold text-white mb-2">{feat.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed mb-4">{feat.description}</p>
+
+                {/* Highlight */}
+                <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
+                  <span className="text-emerald-400">✓</span>
+                  {feat.highlight}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Live Stats Section
+───────────────────────────────────────────────────────────────────────────── */
+const STATS = [
+  { value: MODELS.length, suffix: "+", label: "LLM models benchmarked", icon: "🤖" },
+  { value: 6, suffix: "", label: "environmental metrics tracked", icon: "🌍" },
+  { value: 100, suffix: "%", label: "client-side processing", icon: "🛡️" },
+  { value: 0, suffix: "$", label: "cost to use · always free", icon: "💸", prefix: true },
+];
+
+function StatCard({ stat, started }: { stat: (typeof STATS)[0]; started: boolean }) {
+  const count = useCounter(stat.value, 1600, started);
+  return (
+    <div className="text-center px-4">
+      <div className="text-4xl mb-2">{stat.icon}</div>
+      <div className="text-4xl sm:text-5xl font-black text-white mb-1 tabular-nums">
+        {stat.prefix ? stat.suffix : ""}
+        {count}
+        {!stat.prefix ? stat.suffix : ""}
+      </div>
+      <div className="text-slate-400 text-sm">{stat.label}</div>
+    </div>
+  );
+}
+
+function LiveStatsSection() {
+  const [started, setStarted] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
+      { threshold: 0.4 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={ref} className="py-20 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="glass-card animate-pulse-glow rounded-3xl py-12 px-6 relative overflow-hidden">
+          {/* Background shimmer */}
+          <div className="absolute inset-0 animate-shimmer pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/20 via-transparent to-violet-900/20 pointer-events-none" />
+
+          <div className="relative z-10">
+            <div className="text-center mb-10 scroll-reveal">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
+                By the numbers
+              </h2>
+              <p className="text-slate-400 text-sm">What TokenMetrics.ai brings to your workflow</p>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-800/50">
+              {STATS.map((stat) => (
+                <StatCard key={stat.label} stat={stat} started={started} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   Reports & Settings tabs (unchanged)
+───────────────────────────────────────────────────────────────────────────── */
 function ReportsTab() {
   return (
     <Card className="bg-slate-900 border-slate-800 shadow-xl">
@@ -160,7 +744,8 @@ function ReportsTab() {
           running a comparison to export a clean, formatted report.
         </p>
         <p>
-          Calculations and report generation are executed completely inside your browser using local resources. We never transfer your prompt text to external servers, securing your data privacy.
+          Calculations and report generation are executed completely inside your browser using local
+          resources. We never transfer your prompt text to external servers, securing your data privacy.
         </p>
       </CardContent>
     </Card>
@@ -197,10 +782,14 @@ function SettingsTab({
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-slate-300">
           <p className="text-slate-400 text-xs">
-            Provide your Gemini API key to activate the <strong>Gemini AI Advisor</strong>. This generates contextual, real-world comparison reports about your LLM footprint using AI.
+            Provide your Gemini API key to activate the{" "}
+            <strong>Gemini AI Advisor</strong>. This generates contextual, real-world comparison
+            reports about your LLM footprint using AI.
           </p>
           <div className="space-y-2">
-            <Label htmlFor="gg" className="text-xs font-semibold text-slate-300">Google AI / Gemini API Key</Label>
+            <Label htmlFor="gg" className="text-xs font-semibold text-slate-300">
+              Google AI / Gemini API Key
+            </Label>
             <Input
               id="gg"
               type="password"
@@ -211,7 +800,8 @@ function SettingsTab({
             />
           </div>
           <p className="text-[11px] text-slate-500 leading-normal">
-            Your API key is saved locally in your browser's <code>localStorage</code> and called directly. It is never transmitted to any other server.
+            Your API key is saved locally in your browser's <code>localStorage</code> and called
+            directly. It is never transmitted to any other server.
           </p>
         </CardContent>
       </Card>
@@ -228,18 +818,67 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-function PrivacyBadge() {
+/* ─────────────────────────────────────────────────────────────────────────────
+   Enhanced Footer
+───────────────────────────────────────────────────────────────────────────── */
+function EnhancedFooter() {
   return (
-    <footer className="mt-16 border-t border-slate-800/80 pt-8 text-center">
-      <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/5 text-emerald-400 px-3 py-1 font-medium text-xs">
-        🛡️ Privacy-First Layout
-      </Badge>
-      <p className="mt-3 text-xs text-slate-500">
-        All benchmarking and processing takes place client-side. We never store or train on your prompt data.
-      </p>
-      <p className="mt-1 text-[11px] text-slate-600">
-        © {new Date().getFullYear()} TokenMetrics.ai · Open-source benchmarking
-      </p>
+    <footer className="border-t border-slate-800/60 mt-8 px-4 py-16">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+          {/* Brand */}
+          <div>
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg step-badge text-white font-mono text-base font-bold">T</div>
+              <div className="text-base font-bold text-white">TokenMetrics<span className="text-indigo-400">.ai</span></div>
+            </div>
+            <p className="text-slate-500 text-sm leading-relaxed mb-4">
+              The most comprehensive LLM cost, performance, and environmental impact calculator. Free forever. Private by design.
+            </p>
+            <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs">
+              🛡️ Privacy-first · No tracking
+            </Badge>
+          </div>
+
+          {/* Links */}
+          <div>
+            <div className="text-sm font-semibold text-slate-300 mb-4">Navigate</div>
+            <ul className="space-y-2 text-sm text-slate-500">
+              {[
+                { label: "How it works", href: "#how-it-works" },
+                { label: "Features", href: "#features" },
+                { label: "Calculator", href: "#calculator" },
+              ].map(({ label, href }) => (
+                <li key={href}>
+                  <a href={href} className="hover:text-slate-200 transition-colors">{label}</a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Details */}
+          <div>
+            <div className="text-sm font-semibold text-slate-300 mb-4">Technical details</div>
+            <ul className="space-y-2 text-sm text-slate-500">
+              <li>Client-side tiktoken tokenization</li>
+              <li>Gemini 2.5 Flash AI advisor</li>
+              <li>Real-time environmental metrics</li>
+              <li>PDF export via html2pdf.js</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-slate-800/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-xs text-slate-600">
+            © {new Date().getFullYear()} TokenMetrics.ai · Built by{" "}
+            <span className="text-slate-400 font-semibold">shabaresh</span> · Open-source benchmarking
+          </p>
+          <p className="text-xs text-slate-600">
+            All processing client-side · No prompt data stored · No analytics
+          </p>
+        </div>
+      </div>
     </footer>
   );
 }
