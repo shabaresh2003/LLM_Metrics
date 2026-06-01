@@ -97,6 +97,7 @@ export function CalculatorView(props: Props) {
 
   const [playgroundLive, setPlaygroundLive] = useState(true);
   const [autoOutput, setAutoOutput] = useState(true);
+  const [taskTemplate, setTaskTemplate] = useState<string>("general");
   const [parsingPdf, setParsingPdf] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -118,20 +119,36 @@ export function CalculatorView(props: Props) {
       });
   }, [selectedIds, fullPrompt, outputTokens, playgroundLive]);
 
-  // Auto-estimate output tokens from average input token count across selected models.
+  // Auto-estimate output tokens from average input token count and selected task template.
   useEffect(() => {
     if (!autoOutput) return;
     const selected = selectedIds
       .map((id) => MODELS.find((m) => m.id === id))
       .filter((m): m is ModelSpec => Boolean(m));
     if (selected.length === 0) return;
-    const avgIn =
+    const avgIn = Math.round(
       selected.reduce((s, m) => s + countTokens(fullPrompt, m.encoding), 0) /
-      selected.length;
-    const est = estimateOutputTokens(Math.round(avgIn));
+      selected.length
+    );
+
+    let est = 256;
+    if (taskTemplate === "general") {
+      est = estimateOutputTokens(avgIn);
+    } else if (taskTemplate === "summarize") {
+      est = Math.max(50, Math.round(avgIn * 0.15));
+    } else if (taskTemplate === "translate") {
+      est = Math.max(1, avgIn);
+    } else if (taskTemplate === "coding") {
+      est = 600;
+    } else if (taskTemplate === "writing") {
+      est = 800;
+    } else if (taskTemplate === "extraction") {
+      est = 250;
+    }
+
     if (est !== outputTokens) setOutputTokens(est);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOutput, fullPrompt, selectedIds]);
+  }, [autoOutput, fullPrompt, selectedIds, taskTemplate])
 
   const monthlyResults = useMemo(
     () =>
@@ -354,9 +371,35 @@ Keep the response engaging, fact-oriented, and relatively brief (around 250-350 
                 }}
                 className="font-mono bg-slate-950 border-slate-800 text-slate-100 focus-visible:ring-indigo-500"
               />
+              <div className="flex flex-wrap gap-1 mt-1.5">
+                {[
+                  { id: "general", label: "General" },
+                  { id: "summarize", label: "Summarize" },
+                  { id: "translate", label: "Translate" },
+                  { id: "coding", label: "Code" },
+                  { id: "writing", label: "Write" },
+                  { id: "extraction", label: "Extract" },
+                ].map((t) => (
+                  <Badge
+                    key={t.id}
+                    variant={taskTemplate === t.id && autoOutput ? "default" : "outline"}
+                    className={`text-[10px] px-2 py-0.5 cursor-pointer transition-all ${
+                      taskTemplate === t.id && autoOutput
+                        ? "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent"
+                        : "border-slate-800 text-slate-400 hover:text-slate-200"
+                    }`}
+                    onClick={() => {
+                      setTaskTemplate(t.id);
+                      setAutoOutput(true);
+                    }}
+                  >
+                    {t.label}
+                  </Badge>
+                ))}
+              </div>
               {autoOutput && (
                 <p className="text-[11px] text-slate-400 italic">
-                  Estimated automatically from your prompt size.
+                  Estimated automatically ({taskTemplate === "general" ? "general heuristic" : `${taskTemplate} template`}).
                 </p>
               )}
             </div>
