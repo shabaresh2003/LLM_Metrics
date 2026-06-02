@@ -1,0 +1,168 @@
+{
+  "costFacts": {
+    "zero": [
+      "✨ Essentially free — zero financial footprint this month!"
+    ],
+    "under1": [
+      "🪙 Less than a single gumball from a 25¢ machine. Seriously cheap.",
+      "☕ That's cheaper than the loose change you find in a sofa cushion.",
+      "🎲 You'd spend more money on a single dice roll at an arcade.",
+      "🍬 A handful of penny candy from the corner store costs more than this.",
+      "📎 Even a box of paper clips is pricier. This is remarkably efficient.",
+      "🚿 You'll spend more on the water for one shower than on this LLM call.",
+      "🔋 Cheaper than the electricity to charge your phone for a day.",
+      "🐜 Ants carry food proportionally worth more than this. Tiny but mighty.",
+      "🧻 Less than a single sheet of premium tissue paper from a fancy hotel.",
+      "🌱 A sunflower seed costs more. This is practically free-range computing."
+    ],
+    "under10": [
+      "☕ That's about {n} artisan coffee(s) — your barista is more expensive than your AI.",
+      "🍕 Roughly {n} slices of NYC pizza. The AI costs less than lunch.",
+      "🎵 You could buy {n} songs on iTunes for this — or let AI answer questions all month.",
+      "🧃 {n} fresh fruit juices from a café. AI runs on less than your afternoon drink.",
+      "🎮 Less than a single mobile game power-up pack. Real intelligence, app-store price.",
+      "📚 Cheaper than a used paperback novel. The AI reads faster too.",
+      "🍩 About {n} glazed doughnuts. Delicious value.",
+      "🚌 That's a couple of bus rides. Your AI commute costs nothing.",
+      "🍦 {n} scoops of ice cream. Sweet, affordable intelligence.",
+      "🧁 Less than a cupcake at a trendy bakery. Way fewer calories too."
+    ],
+    "under100": [
+      "📺 That's {n} Netflix subscriptions a month — your AI binging costs less.",
+      "🎮 About {n} ChatGPT Plus plans. You're basically buying AI in bulk.",
+      "🍣 {n} takeaway sushi rolls. The AI's calorie-free AND cheaper.",
+      "🎵 {n} months of Spotify Premium. Your AI playlist never repeats.",
+      "🥗 Roughly {n} healthy meal-kit deliveries. AI eats nothing in return.",
+      "🏋️ {n} gym day passes. The AI is already in shape.",
+      "🎬 {n} cinema tickets for the latest blockbuster. Drama without the popcorn.",
+      "📱 About {n} months of a mobile plan. Better signal than your carrier.",
+      "🛏️ {n} nights on a budget hostel bed. AI never sleeps.",
+      "🍷 {n} decent bottles of wine. Cheers to efficient computing!"
+    ],
+    "under1000": [
+      "🎧 {n} pair(s) of AirPods Pro every single month. Your AI habit costs as much as premium headphones.",
+      "👟 {n} pairs of Nike Air Max. Your AI literally costs a shoe drop.",
+      "📷 {n} GoPro cameras. Go document your AI adventures.",
+      "🎸 {n} entry-level guitars. Rock on, LLM.",
+      "✈️ {n} budget airline flights. Your AI travels at the speed of tokens.",
+      "🎮 {n} brand-new video games. Game over for boring research.",
+      "📚 {n} months of a Coursera annual plan. The AI never stops learning either.",
+      "🏕️ {n} nights glamping under the stars. AI doesn't need a tent.",
+      "🧳 {n} premium carry-on suitcases. No baggage fees for your AI.",
+      "🖨️ {n} mid-range printers — though your AI creates better output."
+    ],
+    "under10000": [
+      "💻 That's {n} MacBook Pro M4(s) per month. Your AI runs a mini Apple Store.",
+      "🏍️ {n} Honda scooter(s) a month. Your AI commutes at the speed of light.",
+      "💎 {n} high-end smartwatches. Time flies when AI is computing.",
+      "📡 {n} months of satellite internet. Your AI has better bandwidth.",
+      "🛋️ {n} designer sofas. Sit back and let the AI do the work.",
+      "🖥️ {n} professional 4K monitors. Your AI sees everything clearly.",
+      "🎻 {n} professional violins. A symphony of tokens.",
+      "🏄 {n} surfboard + wetsuit kits. Ride the AI wave.",
+      "🔭 {n} amateur telescopes. AI sees further.",
+      "🧑‍🍳 {n} professional chef knife sets. Cutting-edge, literally."
+    ],
+    "above10000": [
+      "👩‍💻 {n} full-time software developer salaries ($1k/mo). Your AI is running a whole team.",
+      "🏢 You could rent {n} co-working desks in NYC every month. AI works from everywhere.",
+      "🏎️ {n} used Tesla Model 3(s) every month. Fast like your model, efficient too.",
+      "🎓 {n} college credit hours at a state university. AI has a PhD already.",
+      "🌍 Enough to fund {n} international round-trip flights. AI doesn't need a visa.",
+      "🏡 {n} months of a mortgage on a median US home. AI is real estate too.",
+      "🚀 A fraction of a SpaceX Starlink terminal deployment. Your AI has orbit-level ambition.",
+      "🎬 {n} days of Hollywood film production. Lights, camera, tokens!",
+      "🏥 {n} ER visits' worth of cost in the US. Your AI is more affordable than healthcare.",
+      "⚡ Enough electricity to power {n} US homes for a day — but it's smarter."
+    ]
+  },
+  "waterFacts": {
+    "zero": [
+      "💧 No water footprint this month. Pristinely dry."
+    ],
+    "under1": [
+      "💧 Less than a single sip of water. Your AI is practically desert-air dry.",
+      "🌵 Smaller than a cactus's daily intake. Incredibly efficient.",
+      "🐜 An ant would drink proportionally more. Tiny footprint!",
+      "🔬 You'd need a microscope to see this water footprint on a global scale.",
+      "🫧 Less than a soap bubble's worth. Barely there."
+    ],
+    "under10": [
+      "🍶 {n} standard 500mL water bottles. Your AI is thirstier than a hamster.",
+      "🌱 Enough to water a houseplant for {n} days.",
+      "🎨 Less water than you'd use to rinse a single paintbrush.",
+      "🧪 Fits in a small lab beaker. Science says this is very manageable.",
+      "🐟 Not enough to fill a goldfish bowl. Your AI is eco-friendlier than your pet.",
+      "🫗 About {n} average glasses of water. Barely a round.",
+      "🧃 Fewer than {n} juice boxes. Surprisingly tiny.",
+      "☁️ A cloud produces this much water vapor in seconds. You're below cloud-level."
+    ],
+    "under100": [
+      "🚿 Enough for {n} average showers. Your AI takes fewer than you do.",
+      "🧑‍🤝‍🧑 Daily drinking water for {n} people. Your AI is supporting a small group.",
+      "🪣 {n} full household buckets. A fraction of a backyard pool.",
+      "🌻 Enough to keep {n} sunflower plants happy for a week.",
+      "🏊 {n}% of an Olympic swimming pool. Practically microscopic.",
+      "🍝 Water used to cook {n} pots of pasta. Al dente computing.",
+      "🐕 Enough water to give {n} dogs their daily drink. Woof-efficiency.",
+      "🧼 Less than {n} full hand-washing sessions. Clean conscience."
+    ],
+    "under1000": [
+      "🛁 {n} standard bathtub(s) of water evaporated to keep your AI cool.",
+      "🚗 Enough to hand-wash {n} cars. Your AI is doing a lot of heavy lifting.",
+      "🌳 Water consumption of {n} mature oak trees for a month.",
+      "🏡 {n} days' worth of an average US household's daily water use.",
+      "🐊 Enough water to keep {n} alligators comfortable for a day.",
+      "🏗️ Roughly the water used pouring {n} cubic meters of concrete.",
+      "🍺 About {n} kegs of beer's worth of water. Cheers!",
+      "🌾 Irrigation water for {n} square meters of wheat field."
+    ],
+    "under10000": [
+      "👕 Water footprint of {n} cotton T-shirt(s). Fashion has never been so digital.",
+      "☕ Equivalent to brewing {n} kg of coffee. That's a serious café operation.",
+      "🐄 Water consumed by {n} dairy cows in a day. Moo-maginative.",
+      "🥩 Enough to produce {n} kg of beef. Your AI is beefy.",
+      "🏊 About {n} average backyard swimming pools.",
+      "🌽 Irrigation for {n} kg of corn. Your AI could feed a village.",
+      "🏭 Less than a factory uses in an hour. Industrial-scale efficiency.",
+      "🛩️ Roughly the water used to manufacture {n} commercial airline seats."
+    ],
+    "above10000": [
+      "🌍 Annual drinking water supply for {n} people. Your AI is running at city-scale.",
+      "🏙️ Comparable to a small town's monthly residential water use. Urban AI vibes.",
+      "🏞️ Enough to fill {n} small lakes. Nature-scale computation.",
+      "🚒 {n} full fire truck tankers. Your AI is fighting fires — metaphorically.",
+      "🎡 More than the water used by a mid-size amusement park in a day.",
+      "⛵ Enough to float {n} small sailboats. Set sail, AI.",
+      "🌊 A meaningful fraction of a river's daily flow. Your AI is making waves.",
+      "🏊 {n} Olympic swimming pools. Splash zone: AI."
+    ]
+  },
+  "carbonFacts": [
+    "🚗 Equivalent to driving {n} miles in an average gasoline passenger car.",
+    "📱 Equivalent to charging {n} smartphones.",
+    "🌳 Offset by {n} mature trees growing and absorbing carbon for a whole year.",
+    "💡 Equivalent to keeping an LED lightbulb running for {n} hours.",
+    "🚂 Equivalent to a train passenger traveling {n} kilometers."
+  ],
+  "recommendations": {
+    "general": [
+      "Use **prompt distillation** or prompt compression to reduce input size for frequently used system instructions.",
+      "If high accuracy is paramount, use frontier models but implement caching strategies to cut down input token costs.",
+      "Regularly audit outputs to adjust `max_tokens` settings and avoid runaway generation charges."
+    ],
+    "highCost": [
+      "Your monthly LLM spend is substantial. We highly recommend routing simpler queries (like classification or summarization) to smaller models like **Gemini 1.5 Flash** or **GPT-4o-mini** which cost up to 80% less.",
+      "Implement **semantic caching** in your backend so you do not pay for identical prompts repeated by different users.",
+      "For multi-step agentic workflows, use cheaper models for routing and planning, and only invoke frontier models for final synthesis."
+    ],
+    "highWater": [
+      "Water consumption is significant. Datacenter cooling requirements are substantial. Consider switching workloads to regions with lower WUE (Water Usage Effectiveness).",
+      "Run large batch offline processing jobs during off-peak night hours when datacenters cool down naturally, reducing HVAC water evaporation."
+    ],
+    "highCarbon": [
+      "Your carbon footprint is notable. Look into hosting open-source models on carbon-neutral hosting providers or public clouds that run on 100% renewable energy.",
+      "Consider routing requests to green regions (such as Northern Europe, US West, or France) where electricity comes from low-carbon or clean power grids."
+    ]
+  }
+}

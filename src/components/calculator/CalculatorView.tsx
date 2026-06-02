@@ -51,6 +51,7 @@ import {
   formatUsd,
   MODELS,
   generateRelatableFacts,
+  generateLocalAdvisorInsights,
   type MetricsResult,
   type ModelSpec,
 } from "@/lib/metrics";
@@ -77,7 +78,6 @@ interface Props {
   setSelectedIds: (v: string[]) => void;
   callsPerMonth: number;
   setCallsPerMonth: (v: number) => void;
-  geminiApiKey?: string;
 }
 
 export function CalculatorView(props: Props) {
@@ -92,7 +92,6 @@ export function CalculatorView(props: Props) {
     setSelectedIds,
     callsPerMonth,
     setCallsPerMonth,
-    geminiApiKey,
   } = props;
 
   const [playgroundLive, setPlaygroundLive] = useState(true);
@@ -101,10 +100,9 @@ export function CalculatorView(props: Props) {
   const [parsingPdf, setParsingPdf] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Gemini AI Advisor State
+  // Smart Advisor State
   const [aiLoading, setAiLoading] = useState(false);
   const [aiInsights, setAiInsights] = useState<string | null>(null);
-  const [aiError, setAiError] = useState<string | null>(null);
 
   const fullPrompt = `${systemPrompt}\n\n${userPrompt}`.trim();
 
@@ -167,70 +165,23 @@ export function CalculatorView(props: Props) {
     [results, callsPerMonth],
   );
 
-  // Generate dynamic AI Insights via Gemini API
-  const generateAiInsights = async () => {
-    if (!geminiApiKey) {
-      setAiError("Please provide a Gemini API key in the Settings tab first.");
-      return;
-    }
+  // Generate dynamic Advisor Insights locally
+  const generateAiInsights = () => {
     setAiLoading(true);
-    setAiError(null);
     setAiInsights(null);
 
-    try {
-      const selectedModelsText = monthlyResults
-        .map((r) => {
-          return `- **${r.model.displayName}** (${r.model.provider}): Cost/call: $${r.costUsd.toFixed(6)}, Monthly Cost: $${r.monthlyCost.toFixed(2)}, Water/call: ${r.waterMl.toFixed(1)} mL, Monthly Water: ${(r.monthlyWater / 1000).toFixed(1)} L, CO2e: ${r.co2eG.toFixed(3)}g, E2E Latency: ${r.e2eLatencyMs.toFixed(0)}ms.`;
-        })
-        .join("\n");
-
-      const promptText = `Analyze the following LLM metrics comparison for a monthly workload of ${callsPerMonth.toLocaleString()} runs. Each run has ${monthlyResults[0]?.inputTokens || 0} input tokens and ${outputTokens} output tokens.
-      
-Workload comparison data:
-${selectedModelsText}
-
-As an expert Cloud Economics & Sustainable AI Architect, provide a concise and highly actionable evaluation report in clean Markdown.
-Structure your report with:
-- **Cost vs. Performance Trade-off**: Which models offer the best value?
-- **Environmental Impact Assessment**: Analyze the water & carbon footprints.
-- **Relatable Real-World Facts**: Give 2-3 extremely creative, funny, or mind-blowing real-world analogies (e.g. comparing the total cost to developer salaries, coffee, subscriptions, or water usage to bathtubs, cotton T-shirts, or household drinking needs).
-Keep the response engaging, fact-oriented, and relatively brief (around 250-350 words).`;
-
-      const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${geminiApiKey}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: promptText }] }],
-            generationConfig: {
-              temperature: 0.7,
-              maxOutputTokens: 1000,
-            },
-          }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Gemini API returned status ${response.status}. Please check your API key.`);
+    setTimeout(() => {
+      try {
+        const text = generateLocalAdvisorInsights(monthlyResults, callsPerMonth, outputTokens);
+        setAiInsights(text);
+        toast.success("Advisor Insights generated successfully!");
+      } catch (err: any) {
+        console.error(err);
+        toast.error("Failed to generate Advisor Insights");
+      } finally {
+        setAiLoading(false);
       }
-
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!text) {
-        throw new Error("No insights could be generated. Please try again.");
-      }
-      setAiInsights(text);
-      toast.success("AI Insights generated successfully!");
-    } catch (err: any) {
-      console.error(err);
-      setAiError(err.message || "Failed to communicate with Gemini API.");
-      toast.error("Failed to generate AI Insights");
-    } finally {
-      setAiLoading(false);
-    }
+    }, 300);
   };
 
   function toggleModel(id: string) {
@@ -509,15 +460,15 @@ Keep the response engaging, fact-oriented, and relatively brief (around 250-350 
           </CardContent>
         </Card>
 
-        {/* Gemini AI Advisor Panel */}
+        {/* Smart Advisor Panel */}
         <Card className="bg-slate-900 border-indigo-500/20 shadow-xl flex flex-col justify-between shadow-indigo-500/5 relative overflow-hidden">
           <div className="absolute top-0 right-0 h-32 w-32 bg-indigo-500/5 rounded-full blur-3xl -z-10" />
           <CardHeader className="pb-3">
             <CardTitle className="text-base font-bold text-white flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" /> Gemini AI Advisor
+              <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" /> Smart Metrics Advisor
             </CardTitle>
             <p className="text-xs text-slate-400">
-              Generate dynamic, context-specific trade-off assessments and environmental offsets using AI.
+              Generate dynamic, context-specific trade-off assessments, recommendations, and environmental offsets 100% locally.
             </p>
           </CardHeader>
           <CardContent className="space-y-4 flex-1 flex flex-col justify-between min-h-[300px]">
@@ -528,7 +479,7 @@ Keep the response engaging, fact-oriented, and relatively brief (around 250-350 
             ) : aiLoading ? (
               <div className="flex flex-col items-center justify-center py-16 flex-1 text-slate-400 space-y-3">
                 <Loader2 className="h-8 w-8 text-indigo-500 animate-spin" />
-                <div className="text-sm font-semibold">Gemini is analyzing your LLM footprint...</div>
+                <div className="text-sm font-semibold">Analyzing your LLM footprint...</div>
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center py-12 flex-1 text-center space-y-4 border border-dashed border-slate-800 rounded-lg">
@@ -536,36 +487,23 @@ Keep the response engaging, fact-oriented, and relatively brief (around 250-350 
                 <div>
                   <div className="text-sm font-bold text-slate-300">Unlock Intelligent Advisory Report</div>
                   <p className="text-xs text-slate-500 max-w-sm mt-1">
-                    Provide your Gemini API key in settings to request an automated audit of your models, complete with offset ideas and trade-offs.
+                    Click the button below to generate a local optimization audit of your benchmarked models, complete with offset ideas, cost savings, and trade-offs.
                   </p>
                 </div>
               </div>
             )}
 
-            {aiError && (
-              <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 rounded-lg p-3 text-xs flex items-center gap-2">
-                <AlertTriangle className="h-4.5 w-4.5 shrink-0" />
-                <span>{aiError}</span>
-              </div>
-            )}
-
             <div className="pt-3 border-t border-slate-800/80 mt-auto flex justify-between items-center gap-3">
-              <div className="text-xs text-slate-500 flex items-center gap-1">
-                {geminiApiKey ? (
-                  <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                    <Check className="h-3.5 w-3.5" /> API Key Configured
-                  </span>
-                ) : (
-                  <span className="text-slate-500">No API Key added</span>
-                )}
+              <div className="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                <Check className="h-3.5 w-3.5" /> 100% Local & Private
               </div>
               <Button
                 onClick={generateAiInsights}
-                disabled={aiLoading || !geminiApiKey || monthlyResults.length === 0}
+                disabled={aiLoading || monthlyResults.length === 0}
                 className="bg-indigo-600 text-white hover:bg-indigo-500 font-semibold disabled:bg-slate-800 disabled:text-slate-600 gap-1.5 shadow-md shadow-indigo-600/10"
               >
                 {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                Generate AI Insights
+                Generate Advisor Report
               </Button>
             </div>
           </CardContent>
@@ -836,7 +774,7 @@ function PerModelBars({ results }: { results: MetricsResult[] }) {
   );
 }
 
-// Lightweight Custom Markdown Parser for rendering Gemini responses
+// Lightweight Custom Markdown Parser for rendering advisor responses
 function SimpleMarkdown({ text }: { text: string }) {
   const paragraphs = text.split("\n\n");
   return (

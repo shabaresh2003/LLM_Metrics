@@ -93,20 +93,6 @@ function Index() {
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_SELECTED);
   const [callsPerMonth, setCallsPerMonth] = useState(10000);
 
-  const [geminiApiKey, setGeminiApiKey] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("gemini_api_key") || "AIzaSyDb1xKbZVh_JnE1prYT3m8Keo8SHAOcdYk";
-    }
-    return "AIzaSyDb1xKbZVh_JnE1prYT3m8Keo8SHAOcdYk";
-  });
-
-  const updateGeminiApiKey = (key: string) => {
-    setGeminiApiKey(key);
-    if (typeof window !== "undefined") {
-      localStorage.setItem("gemini_api_key", key);
-    }
-  };
-
   useScrollReveal();
 
   return (
@@ -158,14 +144,13 @@ function Index() {
               setSelectedIds={setSelectedIds}
               callsPerMonth={callsPerMonth}
               setCallsPerMonth={setCallsPerMonth}
-              geminiApiKey={geminiApiKey}
             />
           </TabsContent>
           <TabsContent value="reports" className="mt-6">
             <ReportsTab />
           </TabsContent>
           <TabsContent value="settings" className="mt-6">
-            <SettingsTab geminiApiKey={geminiApiKey} updateGeminiApiKey={updateGeminiApiKey} />
+            <SettingsTab />
           </TabsContent>
         </Tabs>
       </section>
@@ -198,9 +183,11 @@ function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
         {/* Logo */}
         <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg step-badge text-white font-mono text-base font-bold">
-            T
-          </div>
+          <img
+            src="/logo.png"
+            alt="Logo"
+            className="h-9 w-9 object-cover rounded-lg border border-slate-800 shadow"
+          />
           <div>
             <div className="text-base font-bold tracking-tight text-white">
               TokenMetrics<span className="text-indigo-400">.ai</span>
@@ -373,7 +360,7 @@ Gemini 1.5 $1.25/1M`}
         {/* Pill */}
         <div className="inline-flex items-center gap-2 rounded-full border border-indigo-400/40 bg-indigo-500/15 backdrop-blur px-4 py-1.5 text-xs text-indigo-200 font-medium mb-8 animate-pulse-glow">
           <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" />
-          Infrastructure-aware LLM benchmarking · Powered by Gemini AI
+          Infrastructure-aware LLM benchmarking · 100% Client-Side & Private
         </div>
 
         {/* Headline */}
@@ -495,10 +482,10 @@ Gemini 1.5    $0.0012  ⚡ 1.4s`,
   {
     number: "04",
     emoji: "📊",
-    title: "Get your AI-powered report",
+    title: "Get your Smart Advisor report",
     subtitle: "Data + story + recommendations.",
     description:
-      "Gemini AI advisor generates relatable insights — \"This month's LLM spend equals 5 developer salaries\" — plus actionable optimization recommendations and a downloadable PDF.",
+      "Our local Smart Advisor generates relatable insights — \"This month's LLM spend equals 5 developer salaries\" — plus actionable optimization recommendations and a downloadable PDF.",
     code: `💡 Switching to Gemini Flash
    saves $847/mo at your scale.
 💧 Water: 120L = 2 bathtubs.`,
@@ -611,7 +598,7 @@ const FEATURES = [
     icon: "🌍",
     title: "Environmental Impact",
     description:
-      "Track water consumption, energy usage, and CO₂ emissions per request — then contextualize them with relatable real-world facts powered by Gemini AI. Not just numbers — stories.",
+      "Track water consumption, energy usage, and CO₂ emissions per request — then contextualize them with relatable real-world facts computed 100% locally. Not just numbers — stories.",
     highlight: "6 environmental metrics in one view",
     accent: "from-emerald-500/20 to-teal-500/10",
     border: "hover:border-emerald-500/40",
@@ -620,9 +607,9 @@ const FEATURES = [
   },
   {
     icon: "🤖",
-    title: "AI-Powered Advisor",
+    title: "Smart Metrics Advisor",
     description:
-      "Gemini 2.5 Flash analyzes your metrics and generates personalized recommendations — \"Switch to Claude Haiku for simple tasks and save $800/mo\" — not generic advice, your advice.",
+      "Our Smart Advisor analyzes your metrics locally and generates personalized recommendations — \"Switch to Claude Haiku for simple tasks and save $800/mo\" — not generic advice, your advice.",
     highlight: "Personalized optimization recommendations",
     accent: "from-violet-500/20 to-indigo-500/10",
     border: "hover:border-violet-500/40",
@@ -814,13 +801,7 @@ function ReportsTab() {
   );
 }
 
-function SettingsTab({
-  geminiApiKey,
-  updateGeminiApiKey,
-}: {
-  geminiApiKey: string;
-  updateGeminiApiKey: (key: string) => void;
-}) {
+function SettingsTab() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <Card className="bg-slate-900 border-slate-800 shadow-xl">
@@ -840,31 +821,21 @@ function SettingsTab({
 
       <Card className="bg-slate-900 border-slate-800 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-white">API configuration</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">Local Intelligence & Privacy</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-slate-300">
           <p className="text-slate-400 text-xs">
-            Provide your Gemini API key to activate the{" "}
-            <strong>Gemini AI Advisor</strong>. This generates contextual, real-world comparison
-            reports about your LLM footprint using AI.
+            TokenMetrics is now **100% LLM-free and local**. Optimization recommendations, relatable facts, and cost-benefit trade-offs are computed directly inside your browser.
           </p>
-          <div className="space-y-2">
-            <Label htmlFor="gg" className="text-xs font-semibold text-slate-300">
-              Google AI / Gemini API Key
-            </Label>
-            <Input
-              id="gg"
-              type="password"
-              value={geminiApiKey}
-              onChange={(e) => updateGeminiApiKey(e.target.value)}
-              placeholder="AIzaSy..."
-              className="bg-slate-950 border-slate-850 text-slate-100 placeholder:text-slate-600 focus-visible:ring-indigo-500 font-mono"
-            />
+          <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-4 py-3 flex items-start gap-3">
+            <span className="text-lg">🛡️</span>
+            <div>
+              <div className="font-bold text-slate-200 text-xs uppercase tracking-wider">Privacy Guaranteed</div>
+              <div className="text-[11px] text-slate-400 leading-normal mt-0.5">
+                No prompts, credentials, or API keys are ever transmitted to Google or any other third-party servers. All benchmarking is executed via local cryptography and static heuristics.
+              </div>
+            </div>
           </div>
-          <p className="text-[11px] text-slate-500 leading-normal">
-            Your API key is saved locally in your browser's <code>localStorage</code> and called
-            directly. It is never transmitted to any other server.
-          </p>
         </CardContent>
       </Card>
     </div>
@@ -891,7 +862,11 @@ function EnhancedFooter() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg step-badge text-white font-mono text-base font-bold">T</div>
+              <img
+                src="/logo.png"
+                alt="Logo"
+                className="h-9 w-9 object-cover rounded-lg border border-slate-800 shadow"
+              />
               <div className="text-base font-bold text-white">TokenMetrics<span className="text-indigo-400">.ai</span></div>
             </div>
             <p className="text-slate-500 text-sm leading-relaxed mb-4">
@@ -923,9 +898,9 @@ function EnhancedFooter() {
             <div className="text-sm font-semibold text-slate-300 mb-4">Technical details</div>
             <ul className="space-y-2 text-sm text-slate-500">
               <li>Client-side tiktoken tokenization</li>
-              <li>Gemini 2.5 Flash AI advisor</li>
+              <li>Smart Local Metrics Advisor</li>
               <li>Real-time environmental metrics</li>
-              <li>PDF export via html2pdf.js</li>
+              <li>PDF export via browser engine</li>
             </ul>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import pricingData from "./pricing.json";
+import factsData from "./facts.json";
 
 export interface ModelSpec {
   id: string;
@@ -59,16 +60,6 @@ export interface MetricsResult {
 
 /**
  * Compute all metrics for a single prompt against a single model.
- *
- * Methodology:
- * - Cost: (inputTokens/1M * inputPrice) + (outputTokens/1M * outputPrice)
- * - Energy: tokens * Wh-per-token (per Jegham et al. 2025 empirical per-token
- *   energy estimates by model class).
- * - Facility energy: rawEnergy * PUE.
- * - Water (mL): facilityEnergyKWh * (WUE_onsite + WUE_electricity) * 1000.
- *   Defaults reflect U.S. datacenter averages.
- * - CO2e (g): facilityEnergyKWh * grid carbon intensity (gCO2/kWh).
- * - Latency: TTFT (model class baseline) + outputTokens / tokensPerSecond.
  */
 export function computeMetrics({ model, inputTokens, outputTokens }: MetricsInput): MetricsResult {
   const inputCostUsd = (inputTokens / 1_000_000) * model.inputPricePerMTok;
@@ -130,6 +121,98 @@ function pick<T>(arr: T[], seed: number): T {
   return arr[idx];
 }
 
+function replacePlaceholders(fact: string, val: number): string {
+  if (!fact.includes("{n}")) return fact;
+
+  let divisor = 1;
+  let decimals = 0;
+
+  // Cost map
+  if (fact.includes("coffee")) divisor = 4;
+  else if (fact.includes("pizza")) divisor = 2;
+  else if (fact.includes("iTunes")) divisor = 1.29;
+  else if (fact.includes("juices")) divisor = 3;
+  else if (fact.includes("doughnuts")) divisor = 2;
+  else if (fact.includes("ice cream")) divisor = 3;
+  else if (fact.includes("Netflix")) divisor = 18;
+  else if (fact.includes("ChatGPT Plus")) divisor = 20;
+  else if (fact.includes("sushi")) divisor = 12;
+  else if (fact.includes("Spotify")) divisor = 11;
+  else if (fact.includes("meal-kit")) divisor = 15;
+  else if (fact.includes("gym")) divisor = 30;
+  else if (fact.includes("cinema")) divisor = 15;
+  else if (fact.includes("mobile plan")) divisor = 10;
+  else if (fact.includes("hostel")) divisor = 30;
+  else if (fact.includes("wine")) divisor = 25;
+  else if (fact.includes("AirPods")) divisor = 150;
+  else if (fact.includes("Nike")) divisor = 200;
+  else if (fact.includes("GoPro")) divisor = 500;
+  else if (fact.includes("guitar")) divisor = 300;
+  else if (fact.includes("flights") && divisor === 1) divisor = 250;
+  else if (fact.includes("video games")) divisor = 70;
+  else if (fact.includes("Coursera")) divisor = 120;
+  else if (fact.includes("glamping")) divisor = 150;
+  else if (fact.includes("suitcases")) divisor = 400;
+  else if (fact.includes("printers")) divisor = 350;
+  else if (fact.includes("MacBook")) { divisor = 1600; decimals = 1; }
+  else if (fact.includes("scooter")) { divisor = 5000; decimals = 1; }
+  else if (fact.includes("smartwatches")) divisor = 2000;
+  else if (fact.includes("satellite internet")) divisor = 1200;
+  else if (fact.includes("sofas")) divisor = 2500;
+  else if (fact.includes("monitors")) divisor = 3500;
+  else if (fact.includes("violins")) { divisor = 4000; decimals = 1; }
+  else if (fact.includes("surfboard")) divisor = 1500;
+  else if (fact.includes("telescopes")) { divisor = 7000; decimals = 1; }
+  else if (fact.includes("knife sets")) divisor = 2000;
+  else if (fact.includes("developer")) divisor = 1000;
+  else if (fact.includes("co-working")) divisor = 3000;
+  else if (fact.includes("Tesla")) { divisor = 50000; decimals = 1; }
+  else if (fact.includes("college")) divisor = 2500;
+  else if (fact.includes("flights")) divisor = 5000;
+  else if (fact.includes("mortgage")) { divisor = 20000; decimals = 2; }
+  else if (fact.includes("film production")) { divisor = 100000; decimals = 2; }
+  else if (fact.includes("ER visits")) divisor = 1500;
+  else if (fact.includes("homes")) divisor = 100;
+
+  // Water map
+  else if (fact.includes("water bottles")) divisor = 0.5;
+  else if (fact.includes("houseplant")) divisor = 0.3;
+  else if (fact.includes("glasses")) divisor = 0.25;
+  else if (fact.includes("juice boxes")) divisor = 0.3;
+  else if (fact.includes("showers")) divisor = 65;
+  else if (fact.includes("drinking water") && fact.includes("people") && !fact.includes("supply")) divisor = 2;
+  else if (fact.includes("buckets")) divisor = 10;
+  else if (fact.includes("sunflower")) divisor = 1.5;
+  else if (fact.includes("swimming pool") && fact.includes("%")) { divisor = 2500000 / 100; decimals = 4; }
+  else if (fact.includes("pasta")) divisor = 5;
+  else if (fact.includes("dogs")) divisor = 5;
+  else if (fact.includes("hand-washing")) divisor = 7;
+  else if (fact.includes("bathtub")) divisor = 150;
+  else if (fact.includes("cars")) divisor = 120;
+  else if (fact.includes("oak trees")) divisor = 450;
+  else if (fact.includes("household")) divisor = 300;
+  else if (fact.includes("alligators")) divisor = 500;
+  else if (fact.includes("concrete")) divisor = 200;
+  else if (fact.includes("kegs")) divisor = 8;
+  else if (fact.includes("wheat")) { divisor = 500; decimals = 1; }
+  else if (fact.includes("T-shirt")) divisor = 2500;
+  else if (fact.includes("coffee")) divisor = 140;
+  else if (fact.includes("cows")) divisor = 3500;
+  else if (fact.includes("beef")) { divisor = 15000; decimals = 1; }
+  else if (fact.includes("swimming pools") && !fact.includes("%")) { divisor = 2500; decimals = 1; }
+  else if (fact.includes("corn")) divisor = 1000;
+  else if (fact.includes("airline seats")) { divisor = 50000; decimals = 2; }
+  else if (fact.includes("drinking water supply") && fact.includes("people")) { divisor = 2 * 365; decimals = 1; }
+  else if (fact.includes("lakes")) divisor = 1000000;
+  else if (fact.includes("fire truck")) divisor = 10000;
+  else if (fact.includes("sailboats")) divisor = 500000;
+  else if (fact.includes("swimming pools")) divisor = 2500;
+
+  const nVal = val / divisor;
+  const nStr = decimals === 0 ? Math.max(1, Math.round(nVal)).toLocaleString() : nVal.toFixed(decimals);
+  return fact.replace("{n}", nStr);
+}
+
 export function generateRelatableFacts(monthlyCost: number, monthlyWaterMl: number): RelatableFacts {
   const monthlyWaterL = monthlyWaterMl / 1000;
 
@@ -137,190 +220,155 @@ export function generateRelatableFacts(monthlyCost: number, monthlyWaterMl: numb
   let costFact = "";
 
   if (monthlyCost <= 0) {
-    costFact = "✨ Essentially free — zero financial footprint this month!";
-
+    costFact = factsData.costFacts.zero[0];
   } else if (monthlyCost < 1) {
-    const pool = [
-      `🪙 Less than a single gumball from a 25¢ machine. Seriously cheap.`,
-      `☕ That's cheaper than the loose change you find in a sofa cushion.`,
-      `🎲 You'd spend more money on a single dice roll at an arcade.`,
-      `🍬 A handful of penny candy from the corner store costs more than this.`,
-      `📎 Even a box of paper clips is pricier. This is remarkably efficient.`,
-      `🚿 You'll spend more on the water for one shower than on this LLM call.`,
-      `🔋 Cheaper than the electricity to charge your phone for a day.`,
-      `🐜 Ants carry food proportionally worth more than this. Tiny but mighty.`,
-      `🧻 Less than a single sheet of premium tissue paper from a fancy hotel.`,
-      `🌱 A sunflower seed costs more. This is practically free-range computing.`,
-    ];
-    costFact = pick(pool, monthlyCost * 1000);
-
+    const pool = factsData.costFacts.under1;
+    costFact = replacePlaceholders(pick(pool, monthlyCost * 1000), monthlyCost);
   } else if (monthlyCost < 10) {
-    const n = Math.max(1, Math.round(monthlyCost / 4));
-    const pool = [
-      `☕ That's about ${n} artisan coffee(s) — your barista is more expensive than your AI.`,
-      `🍕 Roughly ${Math.round(monthlyCost / 2)} slices of NYC pizza. The AI costs less than lunch.`,
-      `🎵 You could buy ${Math.round(monthlyCost / 1.29)} songs on iTunes for this — or let AI answer questions all month.`,
-      `🧃 ${Math.round(monthlyCost / 3)} fresh fruit juices from a café. AI runs on less than your afternoon drink.`,
-      `🎮 Less than a single mobile game power-up pack. Real intelligence, app-store price.`,
-      `📚 Cheaper than a used paperback novel. The AI reads faster too.`,
-      `🍩 About ${Math.round(monthlyCost / 2)} glazed doughnuts. Delicious value.`,
-      `🚌 That's a couple of bus rides. Your AI commute costs nothing.`,
-      `🍦 ${Math.round(monthlyCost / 3)} scoops of ice cream. Sweet, affordable intelligence.`,
-      `🧁 Less than a cupcake at a trendy bakery. Way fewer calories too.`,
-    ];
-    costFact = pick(pool, monthlyCost * 100);
-
+    const pool = factsData.costFacts.under10;
+    costFact = replacePlaceholders(pick(pool, monthlyCost * 100), monthlyCost);
   } else if (monthlyCost < 100) {
-    const subs = Math.round(monthlyCost / 20);
-    const pool = [
-      `📺 That's ${Math.round(monthlyCost / 18)} Netflix subscriptions a month — your AI binge costs less.`,
-      `🎮 About ${subs} ChatGPT Plus plans. You're basically buying AI in bulk.`,
-      `🍣 ${Math.round(monthlyCost / 12)} takeaway sushi rolls. The AI's calorie-free AND cheaper.`,
-      `🎵 ${Math.round(monthlyCost / 11)} months of Spotify Premium. Your AI playlist never repeats.`,
-      `🥗 Roughly ${Math.round(monthlyCost / 15)} healthy meal-kit deliveries. AI eats nothing in return.`,
-      `🏋️ ${Math.round(monthlyCost / 30)} gym day passes. The AI is already in shape.`,
-      `🎬 ${Math.round(monthlyCost / 15)} cinema tickets for the latest blockbuster. Drama without the popcorn.`,
-      `📱 About ${Math.round(monthlyCost / 10)} months of a mobile plan. Better signal than your carrier.`,
-      `🛏️ ${Math.round(monthlyCost / 30)} nights on a budget hostel bed. AI never sleeps.`,
-      `🍷 ${Math.round(monthlyCost / 25)} decent bottles of wine. Cheers to efficient computing!`,
-    ];
-    costFact = pick(pool, monthlyCost * 10);
-
+    const pool = factsData.costFacts.under100;
+    costFact = replacePlaceholders(pick(pool, monthlyCost * 10), monthlyCost);
   } else if (monthlyCost < 1000) {
-    const airpods = Math.round(monthlyCost / 150);
-    const pool = [
-      `🎧 ${airpods} pair(s) of AirPods Pro every single month. Your AI habit costs as much as premium headphones.`,
-      `👟 ${Math.round(monthlyCost / 200)} pairs of Nike Air Max. Your AI literally costs a shoe drop.`,
-      `📷 ${Math.round(monthlyCost / 500)} GoPro cameras. Go document your AI adventures.`,
-      `🎸 ${Math.round(monthlyCost / 300)} entry-level guitars. Rock on, LLM.`,
-      `✈️ ${Math.round(monthlyCost / 250)} budget airline flights. Your AI travels at the speed of tokens.`,
-      `🎮 ${Math.round(monthlyCost / 70)} brand-new video games. Game over for boring research.`,
-      `📚 ${Math.round(monthlyCost / 120)} months of a Coursera annual plan. The AI never stops learning either.`,
-      `🏕️ ${Math.round(monthlyCost / 150)} nights glamping under the stars. AI doesn't need a tent.`,
-      `🧳 ${Math.round(monthlyCost / 400)} premium carry-on suitcases. No baggage fees for your AI.`,
-      `🖨️ ${Math.round(monthlyCost / 350)} mid-range printers — though your AI creates better output.`,
-    ];
-    costFact = pick(pool, monthlyCost);
-
+    const pool = factsData.costFacts.under1000;
+    costFact = replacePlaceholders(pick(pool, monthlyCost), monthlyCost);
   } else if (monthlyCost < 10000) {
-    const macs = formatNumber(monthlyCost / 1600, 1);
-    const pool = [
-      `💻 That's ${macs} MacBook Pro M4(s) per month. Your AI runs a mini Apple Store.`,
-      `🏍️ ${formatNumber(monthlyCost / 5000, 1)} Honda scooter(s) a month. Your AI commutes at the speed of light.`,
-      `💎 ${Math.round(monthlyCost / 2000)} high-end smartwatches. Time flies when AI is computing.`,
-      `📡 ${Math.round(monthlyCost / 1200)} months of satellite internet. Your AI has better bandwidth.`,
-      `🛋️ ${Math.round(monthlyCost / 2500)} designer sofas. Sit back and let the AI do the work.`,
-      `🖥️ ${Math.round(monthlyCost / 3500)} professional 4K monitors. Your AI sees everything clearly.`,
-      `🎻 ${formatNumber(monthlyCost / 4000, 1)} professional violins. A symphony of tokens.`,
-      `🏄 ${Math.round(monthlyCost / 1500)} surfboard + wetsuit kits. Ride the AI wave.`,
-      `🔭 ${formatNumber(monthlyCost / 7000, 1)} amateur telescopes. AI sees further.`,
-      `🧑‍🍳 ${Math.round(monthlyCost / 2000)} professional chef knife sets. Cutting-edge, literally.`,
-    ];
-    costFact = pick(pool, monthlyCost / 10);
-
+    const pool = factsData.costFacts.under10000;
+    costFact = replacePlaceholders(pick(pool, monthlyCost / 10), monthlyCost);
   } else {
-    const devs = Math.round(monthlyCost / 1000);
-    const pool = [
-      `👩‍💻 ${devs} full-time software developer salaries ($1k/mo). Your AI is running a whole team.`,
-      `🏢 You could rent ${Math.round(monthlyCost / 3000)} co-working desks in NYC every month. AI works from everywhere.`,
-      `🏎️ ${formatNumber(monthlyCost / 50000, 1)} used Tesla Model 3(s) every month. Fast like your model, efficient too.`,
-      `🎓 ${Math.round(monthlyCost / 2500)} college credit hours at a state university. AI has a PhD already.`,
-      `🌍 Enough to fund ${Math.round(monthlyCost / 5000)} international round-trip flights. AI doesn't need a visa.`,
-      `🏡 ${formatNumber(monthlyCost / 20000, 2)} months of a mortgage on a median US home. AI is real estate too.`,
-      `🚀 A fraction of a SpaceX Starlink terminal deployment. Your AI has orbit-level ambition.`,
-      `🎬 ${formatNumber(monthlyCost / 100000, 2)} days of Hollywood film production. Lights, camera, tokens!`,
-      `🏥 ${Math.round(monthlyCost / 1500)} ER visits' worth of cost in the US. Your AI is more affordable than healthcare.`,
-      `⚡ Enough electricity to power ${Math.round(monthlyCost / 100)} US homes for a day — but it's smarter.`,
-    ];
-    costFact = pick(pool, monthlyCost / 100);
+    const pool = factsData.costFacts.above10000;
+    costFact = replacePlaceholders(pick(pool, monthlyCost / 100), monthlyCost);
   }
 
   // ─── WATER FACTS ───────────────────────────────────────────────────────────
   let waterFact = "";
 
   if (monthlyWaterL <= 0) {
-    waterFact = "💧 No water footprint this month. Pristinely dry.";
-
+    waterFact = factsData.waterFacts.zero[0];
   } else if (monthlyWaterL < 1) {
-    const pool = [
-      `💧 Less than a single sip of water. Your AI is practically desert-air dry.`,
-      `🌵 Smaller than a cactus's daily intake. Incredibly efficient.`,
-      `🐜 An ant would drink proportionally more. Tiny footprint!`,
-      `🔬 You'd need a microscope to see this water footprint on a global scale.`,
-      `🫧 Less than a soap bubble's worth. Barely there.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL * 10000);
-
+    const pool = factsData.waterFacts.under1;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL * 10000), monthlyWaterL);
   } else if (monthlyWaterL < 10) {
-    const bottles = Math.round(monthlyWaterL / 0.5);
-    const pool = [
-      `🍶 ${bottles} standard 500mL water bottles. Your AI is thirstier than a hamster.`,
-      `🌱 Enough to water a houseplant for ${Math.round(monthlyWaterL / 0.3)} days.`,
-      `🎨 Less water than you'd use to rinse a single paintbrush.`,
-      `🧪 Fits in a small lab beaker. Science says this is very manageable.`,
-      `🐟 Not enough to fill a goldfish bowl. Your AI is eco-friendlier than your pet.`,
-      `🫗 About ${Math.round(monthlyWaterL / 0.25)} average glasses of water. Barely a round.`,
-      `🧃 Fewer than ${Math.max(1, Math.round(monthlyWaterL / 0.3))} juice boxes. Surprisingly tiny.`,
-      `☁️ A cloud produces this much water vapor in seconds. You're below cloud-level.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL * 1000);
-
+    const pool = factsData.waterFacts.under10;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL * 1000), monthlyWaterL);
   } else if (monthlyWaterL < 100) {
-    const people = Math.round(monthlyWaterL / 2);
-    const pool = [
-      `🚿 Enough for ${Math.round(monthlyWaterL / 65)} average showers. Your AI takes fewer than you do.`,
-      `🧑‍🤝‍🧑 Daily drinking water for ${people} people. Your AI is supporting a small group.`,
-      `🪣 ${Math.round(monthlyWaterL / 10)} full household buckets. A fraction of a backyard pool.`,
-      `🌻 Enough to keep ${Math.round(monthlyWaterL / 1.5)} sunflower plants happy for a week.`,
-      `🏊 ${formatNumber(monthlyWaterL / 2500000 * 100, 4)}% of an Olympic swimming pool. Practically microscopic.`,
-      `🍝 Water used to cook ${Math.round(monthlyWaterL / 5)} pots of pasta. Al dente computing.`,
-      `🐕 Enough water to give ${Math.round(monthlyWaterL / 5)} dogs their daily drink. Woof-efficiency.`,
-      `🧼 Less than ${Math.round(monthlyWaterL / 7)} full hand-washing sessions. Clean conscience.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL * 100);
-
+    const pool = factsData.waterFacts.under100;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL * 100), monthlyWaterL);
   } else if (monthlyWaterL < 1000) {
-    const baths = Math.round(monthlyWaterL / 150);
-    const pool = [
-      `🛁 ${baths} standard bathtub(s) of water evaporated to keep your AI cool.`,
-      `🚗 Enough to hand-wash ${Math.round(monthlyWaterL / 120)} cars. Your AI is doing a lot of heavy lifting.`,
-      `🌳 Water consumption of ${Math.round(monthlyWaterL / 450)} mature oak trees for a month.`,
-      `🏡 ${Math.round(monthlyWaterL / 300)} days' worth of an average US household's daily water use.`,
-      `🐊 Enough water to keep ${Math.round(monthlyWaterL / 500)} alligators comfortable for a day.`,
-      `🏗️ Roughly the water used pouring ${Math.round(monthlyWaterL / 200)} cubic meters of concrete.`,
-      `🍺 About ${Math.round(monthlyWaterL / 8)} kegs of beer's worth of water. Cheers!`,
-      `🌾 Irrigation water for ${formatNumber(monthlyWaterL / 500, 1)} square meters of wheat field.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL * 10);
-
+    const pool = factsData.waterFacts.under1000;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL * 10), monthlyWaterL);
   } else if (monthlyWaterL < 10000) {
-    const tshirts = Math.round(monthlyWaterL / 2500);
-    const pool = [
-      `👕 Water footprint of ${tshirts} cotton T-shirt(s). Fashion has never been so digital.`,
-      `☕ Equivalent to brewing ${Math.round(monthlyWaterL / 140)} kg of coffee. That's a serious café operation.`,
-      `🐄 Water consumed by ${Math.round(monthlyWaterL / 3500)} dairy cows in a day. Moo-maginative.`,
-      `🥩 Enough to produce ${formatNumber(monthlyWaterL / 15000, 1)} kg of beef. Your AI is beefy.`,
-      `🏊 About ${formatNumber(monthlyWaterL / 2500, 1)} average backyard swimming pools.`,
-      `🌽 Irrigation for ${Math.round(monthlyWaterL / 1000)} kg of corn. Your AI could feed a village.`,
-      `🏭 Less than a factory uses in an hour. Industrial-scale efficiency.`,
-      `🛩️ Roughly the water used to manufacture ${formatNumber(monthlyWaterL / 50000, 2)} commercial airline seats.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL);
-
+    const pool = factsData.waterFacts.under10000;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL), monthlyWaterL);
   } else {
-    const peopleYear = formatNumber(monthlyWaterL / (2 * 365), 1);
-    const pool = [
-      `🌍 Annual drinking water supply for ${peopleYear} people. Your AI is running at city-scale.`,
-      `🏙️ Comparable to a small town's monthly residential water use. Urban AI vibes.`,
-      `🏞️ Enough to fill ${Math.round(monthlyWaterL / 1000000)} small lakes. Nature-scale computation.`,
-      `🚒 ${Math.round(monthlyWaterL / 10000)} full fire truck tankers. Your AI is fighting fires — metaphorically.`,
-      `🎡 More than the water used by a mid-size amusement park in a day.`,
-      `⛵ Enough to float ${Math.round(monthlyWaterL / 500000)} small sailboats. Set sail, AI.`,
-      `🌊 A meaningful fraction of a river's daily flow. Your AI is making waves.`,
-      `🏊 ${Math.round(monthlyWaterL / 2500)} Olympic swimming pools. Splash zone: AI.`,
-    ];
-    waterFact = pick(pool, monthlyWaterL / 100);
+    const pool = factsData.waterFacts.above10000;
+    waterFact = replacePlaceholders(pick(pool, monthlyWaterL / 100), monthlyWaterL);
   }
 
   return { costFact, waterFact };
+}
+
+/**
+ * Generate a complete, markdown-formatted advisory report 100% locally.
+ */
+export function generateLocalAdvisorInsights(
+  results: (MetricsResult & {
+    monthlyCost: number;
+    monthlyCo2: number;
+    monthlyWater: number;
+    facts: RelatableFacts;
+  })[],
+  callsPerMonth: number,
+  outputTokens: number
+): string {
+  if (results.length === 0) {
+    return "No models benchmarked. Please select at least one model to generate insights.";
+  }
+
+  // Sort and select key metrics
+  const sortedByCost = [...results].sort((a, b) => a.monthlyCost - b.monthlyCost);
+  const cheapest = sortedByCost[0];
+  const mostExpensive = sortedByCost[sortedByCost.length - 1];
+
+  const sortedByLatency = [...results].sort((a, b) => a.e2eLatencyMs - b.e2eLatencyMs);
+  const fastest = sortedByLatency[0];
+
+  const sortedByCo2 = [...results].sort((a, b) => a.monthlyCo2 - b.monthlyCo2);
+  const greenest = sortedByCo2[0];
+
+  // Average values across the selected set
+  const avgCost = results.reduce((sum, r) => sum + r.monthlyCost, 0) / results.length;
+  const avgWaterL = results.reduce((sum, r) => sum + r.monthlyWater, 0) / results.length / 1000;
+  const avgCo2G = results.reduce((sum, r) => sum + r.monthlyCo2, 0) / results.length;
+  const avgEnergyWh = results.reduce((sum, r) => sum + r.facilityEnergyWh, 0) / results.length * callsPerMonth;
+
+  // Recommendations builder
+  const costRecs: string[] = [];
+  if (avgCost > 100) {
+    costRecs.push(...factsData.recommendations.highCost);
+  } else {
+    costRecs.push(...factsData.recommendations.general);
+  }
+
+  const ecoRecs: string[] = [];
+  if (avgWaterL > 1000) {
+    ecoRecs.push(...factsData.recommendations.highWater);
+  }
+  if (avgCo2G > 1000) {
+    ecoRecs.push(...factsData.recommendations.highCarbon);
+  }
+  if (ecoRecs.length === 0) {
+    ecoRecs.push("Your environmental footprint is relatively small. You can keep it optimal by using smaller models or prompt caching.");
+  }
+
+  // Savings math
+  const monthlySavings = mostExpensive.monthlyCost - cheapest.monthlyCost;
+  const savingsPercent = mostExpensive.monthlyCost > 0
+    ? Math.round(((mostExpensive.monthlyCost - cheapest.monthlyCost) / mostExpensive.monthlyCost) * 100)
+    : 0;
+
+  let tradeOffText = "";
+  if (results.length > 1) {
+    tradeOffText = `Switching from the most expensive model (**${mostExpensive.model.displayName}**) to the cheapest (**${cheapest.model.displayName}**) could save you **${formatUsd(monthlySavings)}/month** (a **${savingsPercent}%** reduction in cost), while your latency will change from **${formatNumber(mostExpensive.e2eLatencyMs, 0)} ms** to **${formatNumber(cheapest.e2eLatencyMs, 0)} ms**.`;
+  } else {
+    tradeOffText = `You are evaluating a single model: **${cheapest.model.displayName}**. Add more models to perform side-by-side trade-off and optimization calculations.`;
+  }
+
+  // Draw 2 dynamic analogies based on the selected models
+  const costAnalogy = cheapest.facts.costFact;
+  const waterAnalogy = cheapest.facts.waterFact;
+
+  // Let's calculate a dynamic carbon analogy
+  const co2eKg = avgCo2G / 1000;
+  let carbonAnalogy = "";
+  if (co2eKg <= 0.01) {
+    carbonAnalogy = `equivalent to keeping an LED lightbulb running for ${Math.round(co2eKg * 200)} minutes.`;
+  } else if (co2eKg < 1) {
+    carbonAnalogy = `equivalent to charging ${Math.round(co2eKg * 120)} smartphones.`;
+  } else if (co2eKg < 10) {
+    carbonAnalogy = `equivalent to driving ${formatNumber(co2eKg * 2.5, 1)} miles in an average gasoline car.`;
+  } else {
+    carbonAnalogy = `offset by ${formatNumber(co2eKg / 22, 2)} mature tree(s) absorbing carbon for a whole year.`;
+  }
+
+  return `### Cost vs. Performance Trade-off
+- **Value Champion**: **${cheapest.model.displayName}** is the most cost-effective option at **${formatUsd(cheapest.monthlyCost)}/mo**.
+- **Speed Leader**: **${fastest.model.displayName}** delivers responses in **${formatNumber(fastest.e2eLatencyMs, 0)} ms** on average.
+- **Trade-off Analysis**: ${tradeOffText}
+
+#### Actionable Optimization Checklist:
+${costRecs.map(r => `- ${r}`).join("\n")}
+
+### Environmental Impact Assessment
+- **Carbon Intensity**: **${greenest.model.displayName}** is the greenest model selected, emitting just **${formatNumber(greenest.monthlyCo2, 2)} g CO₂e/month**.
+- **Total Portfolio Footprint**: Across your selections, average monthly resource demand is **${formatNumber(avgWaterL, 1)} Liters** of water, **${formatNumber(avgCo2G / 1000, 2)} kg CO₂e** greenhouse gases, and **${formatNumber(avgEnergyWh / 1000, 2)} kWh** of power.
+
+#### Eco-Optimization Recommendations:
+${ecoRecs.map(r => `- ${r}`).join("\n")}
+
+### Relatable Real-World Facts
+- **Cost Aspect**: The cost of running **${cheapest.model.displayName}** is *${costAnalogy.replace(/^[^\s]+\s+/, "")}*
+- **Water Consumption**: Keeping the datacenters cool for **${cheapest.model.displayName}** is *${waterAnalogy.replace(/^[^\s]+\s+/, "")}*
+- **Carbon Footprint**: The greenhouse emissions of your average run are *${carbonAnalogy}*`;
 }
