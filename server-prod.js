@@ -35,8 +35,14 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
 
   // 1. Try to serve static file from dist/client
-  const safeSuffix = path.normalize(pathname).replace(/^(\.\.[\/\\])+/, '');
-  const filePath = path.join(CLIENT_DIR, safeSuffix);
+  const safeSuffix = decodeURIComponent(pathname);
+  const filePath = path.resolve(CLIENT_DIR, '.' + safeSuffix);
+  
+  if (!filePath.startsWith(CLIENT_DIR)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain' });
+    res.end('Forbidden');
+    return;
+  }
   
   try {
     const stats = await fs.promises.stat(filePath);

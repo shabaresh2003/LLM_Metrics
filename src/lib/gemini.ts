@@ -5,13 +5,15 @@ import type { CarbonInputs, CarbonCategoryBreakdown, RecommendationAction } from
 // The API key should be provided via environment variables (e.g. .env file)
 const API_KEY = process.env.GEMINI_API_KEY || "";
 
+// Initialize the Google Generative AI client once globally to save memory
+const genAI = new GoogleGenerativeAI(API_KEY);
+// We will use gemini-2.5-flash for fast and reliable responses
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
 export const generatePersonalizedActions = createServerFn({ method: "POST" })
   .handler(async ({ data }: { data: any }) => {
     const typedData = data as { inputs: CarbonInputs; breakdown: CarbonCategoryBreakdown; totalKg: number };
     try {
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      // We will use gemini-2.5-flash for fast and reliable responses
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const prompt = `
       You are an expert environmental consultant providing advice on a personalized carbon footprint calculator. 
