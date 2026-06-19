@@ -106,20 +106,31 @@ As a TanStack Start SSR application, API logic is heavily integrated as Server F
 
 ---
 
-## 🧪 How We Tested
+## 🧪 How We Tested & Secured
 
-### Security & Audits
-- **Path Traversal Patch:** Conducted a security audit on `server-prod.js` and replaced a naive regex with `path.resolve` and strict prefix validation to completely neutralize directory traversal attacks on static asset requests.
-- **Secret Management:** Hardcoded keys were scrubbed from Git history, `.env` protection was enforced, and the production Gemini API key is securely injected at runtime via **GCP Secret Manager**.
+### 🔒 Security Audits
+- **Dependency Vulnerabilities:** Regular patches via `npm audit fix` ensure all build and runtime Node.js dependencies are free of high-severity vulnerabilities.
+- **Server Security Headers:** The `server-prod.js` custom Node server enforces strict HTTP security headers (`Strict-Transport-Security`, `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `X-XSS-Protection`) for both SSR and static assets to prevent clickjacking, MIME-sniffing, and MITM attacks.
+- **Payload Validation & Prompt Injection Defense:** Runtime payload schema validation explicitly intercepts malformed or oversized requests in `gemini.ts` before interpolating variables into the Generative AI prompt, defending against Prompt Injection and memory DoS attacks.
+- **Path Traversal Protection:** The custom static asset server explicitly sanitizes decoded URL pathways. Further, Firestore backend functions validate `userId` format (`/^[a-zA-Z0-9_-]+$/`) to intercept potential NoSQL path-traversal exploits.
+- **Secret Management:** The production Gemini API key is securely injected at runtime via **GCP Secret Manager**—never hardcoded.
 
-### Unit Testing
-The complex mathematics driving the four environmental pillars are strictly evaluated using the **Vitest** testing framework.
+### ♿ Accessibility (a11y)
+The user interface strictly follows WCAG principles:
+- **Semantic HTML & Metadata:** Meaningful page titles and descriptions are injected for screen readers to announce route context accurately.
+- **ARIA Labeling:** Interactive elements, icon-only buttons, and native `radix-ui` `Slider` and `Select` components are thoroughly mapped with `aria-label` attributes to ensure assistive technology compatibility.
 
-To execute the test suite locally:
+### 🧪 Unit & Coverage Testing
+The complex mathematics driving the four environmental pillars—and the deterministic AI fallback engines—are evaluated using the **Vitest** framework. 
+
+Test suites validate:
+1. `metrics.ts`: Extreme edge cases on token extraction, zero-value inputs, and financial formatting boundary checks.
+2. `fallback-actions.ts`: Deterministic conditional branching, ensuring the system flawlessly intercepts offline APIs and accurately categorizes varying lifestyle extremes (e.g., massive commute footprints vs. highly-efficient vegan diets).
+
+To execute the test suite locally with Istanbul/V8 coverage:
 ```bash
-npx vitest run
+npx vitest run --coverage
 ```
-*Note: The unit tests specifically validate that edge cases (like 0 inputs or extreme flight multipliers) generate exactly the correct grading outputs and total Kg.*
 
 ---
 
