@@ -40,18 +40,35 @@ export function Header() {
 
         {/* Nav */}
         <nav className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-          <Link to="/" hash="how-it-works" className="hover:text-white transition-colors">How it works</Link>
-          <Link to="/" hash="features" className="hover:text-white transition-colors">Features</Link>
-          <Link to="/" hash="calculator" className="hover:text-white transition-colors">LLM Calculator</Link>
-          <Link to="/carbon-tracker" className="hover:text-emerald-400 text-emerald-500/80 transition-colors font-medium">🌍 Carbon Tracker</Link>
+          <Link to="/" hash="how-it-works" className="hover:text-white transition-colors">
+            How it works
+          </Link>
+          <Link to="/" hash="features" className="hover:text-white transition-colors">
+            Features
+          </Link>
+          <Link to="/" hash="calculator" className="hover:text-white transition-colors">
+            LLM Calculator
+          </Link>
+          <Link
+            to="/carbon-tracker"
+            className="hover:text-emerald-400 text-emerald-500/80 transition-colors font-medium"
+          >
+            🌍 Carbon Tracker
+          </Link>
         </nav>
 
         {/* Right badges */}
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className="hidden sm:flex border-emerald-500/30 text-emerald-400 font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="hidden sm:flex border-emerald-500/30 text-emerald-400 font-medium text-xs"
+          >
             🛡️ Privacy-first
           </Badge>
-          <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 font-medium text-xs">
+          <Badge
+            variant="outline"
+            className="border-indigo-500/30 text-indigo-400 font-medium text-xs"
+          >
             v2.0 · {MODELS.length} models
           </Badge>
         </div>

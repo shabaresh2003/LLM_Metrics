@@ -1,8 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { calculateCarbon } from './carbon-tracker';
+import { describe, it, expect } from "vitest";
+import { calculateCarbon } from "./carbon-tracker";
 
-describe('calculateCarbon', () => {
-  it('should correctly calculate the carbon footprint for a typical user', () => {
+describe("calculateCarbon", () => {
+  it("should correctly calculate the carbon footprint for a typical user", () => {
     const inputs = {
       transport: {
         carMilesPerWeek: 100,
@@ -13,11 +13,11 @@ describe('calculateCarbon', () => {
         peopleInHousehold: 2,
       },
       diet: {
-        dietType: 'vegetarian',
+        dietType: "vegetarian",
       },
       shopping: {
         shoppingSpendPerMonth: 5000,
-      }
+      },
     };
 
     const result = calculateCarbon(inputs);
@@ -43,17 +43,17 @@ describe('calculateCarbon', () => {
     // Assert total
     const expectedTotal = 2585 + 236 + 164 + 180;
     expect(result.totalKg).toBeCloseTo(expectedTotal, -2);
-    
+
     // Assert letter grade (3165 kg is < 3500, should be a B)
-    expect(result.grade).toBe('B');
+    expect(result.grade).toBe("B");
   });
 
-  it('should return 0 footprint for zero inputs', () => {
+  it("should return 0 footprint for zero inputs", () => {
     const inputs = {
       transport: { carMilesPerWeek: 0, flightsPerYear: 0 },
       energy: { electricityKwhPerMonth: 0, peopleInHousehold: 1 },
-      diet: { dietType: 'vegan' }, // vegan still has a base footprint
-      shopping: { shoppingSpendPerMonth: 0 }
+      diet: { dietType: "vegan" }, // vegan still has a base footprint
+      shopping: { shoppingSpendPerMonth: 0 },
     };
 
     const result = calculateCarbon(inputs);
@@ -61,10 +61,10 @@ describe('calculateCarbon', () => {
     expect(result.breakdown.transport).toBe(0);
     expect(result.breakdown.energy).toBe(0);
     expect(result.breakdown.shopping).toBe(0);
-    
+
     // Vegan is 0.35 * 365 = 127.75
     expect(result.breakdown.diet).toBeCloseTo(128, -1);
     expect(result.totalKg).toBeCloseTo(128, -1);
-    expect(result.grade).toBe('A+');
+    expect(result.grade).toBe("A+");
   });
 });

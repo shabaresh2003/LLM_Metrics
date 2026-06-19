@@ -125,8 +125,7 @@ export function CalculatorView(props: Props) {
       .filter((m): m is ModelSpec => Boolean(m));
     if (selected.length === 0) return;
     const avgIn = Math.round(
-      selected.reduce((s, m) => s + countTokens(fullPrompt, m.encoding), 0) /
-      selected.length
+      selected.reduce((s, m) => s + countTokens(fullPrompt, m.encoding), 0) / selected.length,
     );
 
     let est = 256;
@@ -146,7 +145,7 @@ export function CalculatorView(props: Props) {
 
     if (est !== outputTokens) setOutputTokens(est);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoOutput, fullPrompt, selectedIds, taskTemplate])
+  }, [autoOutput, fullPrompt, selectedIds, taskTemplate]);
 
   const monthlyResults = useMemo(
     () =>
@@ -175,7 +174,7 @@ export function CalculatorView(props: Props) {
         const text = generateLocalAdvisorInsights(monthlyResults, callsPerMonth, outputTokens);
         setAiInsights(text);
         toast.success("Advisor Insights generated successfully!");
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
         toast.error("Failed to generate Advisor Insights");
       } finally {
@@ -234,12 +233,20 @@ export function CalculatorView(props: Props) {
               <Label htmlFor="live" className="text-xs text-slate-400 font-medium">
                 Live
               </Label>
-              <Switch id="live" checked={playgroundLive} onCheckedChange={setPlaygroundLive} className="data-[state=checked]:bg-indigo-600" />
+              <Switch
+                id="live"
+                checked={playgroundLive}
+                onCheckedChange={setPlaygroundLive}
+                className="data-[state=checked]:bg-indigo-600"
+              />
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="system" className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Label
+                htmlFor="system"
+                className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"
+              >
                 <Brain className="h-3.5 w-3.5 text-indigo-400" /> System Prompt
               </Label>
               <Textarea
@@ -252,7 +259,10 @@ export function CalculatorView(props: Props) {
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <Label htmlFor="user" className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Label
+                  htmlFor="user"
+                  className="text-[10px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5"
+                >
                   <FileText className="h-3.5 w-3.5 text-indigo-400" /> User content
                 </Label>
                 <div className="flex gap-2">
@@ -287,7 +297,11 @@ export function CalculatorView(props: Props) {
               />
               <div className="flex items-center justify-between pt-1">
                 <p className="text-xs text-slate-400 font-medium">
-                  Length: <span className="text-indigo-400 font-semibold">{fullPrompt.length.toLocaleString()}</span> characters
+                  Length:{" "}
+                  <span className="text-indigo-400 font-semibold">
+                    {fullPrompt.length.toLocaleString()}
+                  </span>{" "}
+                  characters
                 </p>
               </div>
             </div>
@@ -305,10 +319,18 @@ export function CalculatorView(props: Props) {
                   Expected Output Tokens
                 </Label>
                 <div className="flex items-center gap-1.5">
-                  <Label htmlFor="auto-out" className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+                  <Label
+                    htmlFor="auto-out"
+                    className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider"
+                  >
                     Auto-est
                   </Label>
-                  <Switch id="auto-out" checked={autoOutput} onCheckedChange={setAutoOutput} className="data-[state=checked]:bg-indigo-600" />
+                  <Switch
+                    id="auto-out"
+                    checked={autoOutput}
+                    onCheckedChange={setAutoOutput}
+                    className="data-[state=checked]:bg-indigo-600"
+                  />
                 </div>
               </div>
               <Input
@@ -350,7 +372,8 @@ export function CalculatorView(props: Props) {
               </div>
               {autoOutput && (
                 <p className="text-[11px] text-slate-400 italic">
-                  Estimated automatically ({taskTemplate === "general" ? "general heuristic" : `${taskTemplate} template`}).
+                  Estimated automatically (
+                  {taskTemplate === "general" ? "general heuristic" : `${taskTemplate} template`}).
                 </p>
               )}
             </div>
@@ -376,7 +399,8 @@ export function CalculatorView(props: Props) {
 
             <div className="space-y-2">
               <Label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1">
-                <Zap className="h-3.5 w-3.5 text-indigo-400" /> Selected Models ({selectedIds.length})
+                <Zap className="h-3.5 w-3.5 text-indigo-400" /> Selected Models (
+                {selectedIds.length})
               </Label>
               <div className="grid max-h-[220px] grid-cols-1 gap-1.5 overflow-y-auto pr-1">
                 {MODELS.map((m) => {
@@ -395,7 +419,10 @@ export function CalculatorView(props: Props) {
                         <div className="font-semibold text-slate-200">{m.displayName}</div>
                         <div className="text-[10px] text-slate-400">{m.provider}</div>
                       </div>
-                      <Badge variant={active ? "default" : "secondary"} className={`text-[9px] font-semibold tracking-wide ${active ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-400"}`}>
+                      <Badge
+                        variant={active ? "default" : "secondary"}
+                        className={`text-[9px] font-semibold tracking-wide ${active ? "bg-indigo-600 text-white" : "bg-slate-800 text-slate-400"}`}
+                      >
                         {m.class}
                       </Badge>
                     </button>
@@ -419,7 +446,8 @@ export function CalculatorView(props: Props) {
               <Brain className="h-5 w-5 text-indigo-400" /> Real-World Impact Translator
             </CardTitle>
             <p className="text-xs text-slate-400">
-              Comparing abstract metrics into relatable physical, economic, and human-scale concepts.
+              Comparing abstract metrics into relatable physical, economic, and human-scale
+              concepts.
             </p>
           </CardHeader>
           <CardContent className="space-y-4 flex-1">
@@ -430,7 +458,10 @@ export function CalculatorView(props: Props) {
             ) : (
               <div className="space-y-3 max-h-[360px] overflow-y-auto pr-1">
                 {monthlyResults.map((r) => (
-                  <div key={r.model.id} className="border border-slate-800/80 bg-slate-950/30 rounded-xl p-3.5 space-y-2">
+                  <div
+                    key={r.model.id}
+                    className="border border-slate-800/80 bg-slate-950/30 rounded-xl p-3.5 space-y-2"
+                  >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-bold text-white">{r.model.displayName}</span>
                       <Badge className="bg-indigo-600/10 text-indigo-400 border border-indigo-500/20 text-[9px]">
@@ -441,15 +472,23 @@ export function CalculatorView(props: Props) {
                       <div className="bg-indigo-950/20 border border-indigo-950/30 rounded-lg p-2.5 flex items-start gap-2">
                         <Coins className="h-4 w-4 text-indigo-400 shrink-0 mt-0.5" />
                         <div>
-                          <div className="font-bold text-slate-300">Cost: {formatUsd(r.monthlyCost)}/mo</div>
-                          <div className="text-slate-400 text-[11px] leading-tight mt-0.5">{r.facts.costFact}</div>
+                          <div className="font-bold text-slate-300">
+                            Cost: {formatUsd(r.monthlyCost)}/mo
+                          </div>
+                          <div className="text-slate-400 text-[11px] leading-tight mt-0.5">
+                            {r.facts.costFact}
+                          </div>
                         </div>
                       </div>
                       <div className="bg-cyan-950/20 border border-cyan-950/30 rounded-lg p-2.5 flex items-start gap-2">
                         <Droplet className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
                         <div>
-                          <div className="font-bold text-slate-300">Water: {formatNumber(r.monthlyWater / 1000, 1)} L/mo</div>
-                          <div className="text-slate-400 text-[11px] leading-tight mt-0.5">{r.facts.waterFact}</div>
+                          <div className="font-bold text-slate-300">
+                            Water: {formatNumber(r.monthlyWater / 1000, 1)} L/mo
+                          </div>
+                          <div className="text-slate-400 text-[11px] leading-tight mt-0.5">
+                            {r.facts.waterFact}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -468,7 +507,8 @@ export function CalculatorView(props: Props) {
               <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" /> Smart Metrics Advisor
             </CardTitle>
             <p className="text-xs text-slate-400">
-              Generate dynamic, context-specific trade-off assessments, recommendations, and environmental offsets 100% locally.
+              Generate dynamic, context-specific trade-off assessments, recommendations, and
+              environmental offsets 100% locally.
             </p>
           </CardHeader>
           <CardContent className="space-y-4 flex-1 flex flex-col justify-between min-h-[300px]">
@@ -485,9 +525,12 @@ export function CalculatorView(props: Props) {
               <div className="flex flex-col items-center justify-center py-12 flex-1 text-center space-y-4 border border-dashed border-slate-800 rounded-lg">
                 <Brain className="h-10 w-10 text-slate-600" />
                 <div>
-                  <div className="text-sm font-bold text-slate-300">Unlock Intelligent Advisory Report</div>
+                  <div className="text-sm font-bold text-slate-300">
+                    Unlock Intelligent Advisory Report
+                  </div>
                   <p className="text-xs text-slate-500 max-w-sm mt-1">
-                    Click the button below to generate a local optimization audit of your benchmarked models, complete with offset ideas, cost savings, and trade-offs.
+                    Click the button below to generate a local optimization audit of your
+                    benchmarked models, complete with offset ideas, cost savings, and trade-offs.
                   </p>
                 </div>
               </div>
@@ -502,7 +545,11 @@ export function CalculatorView(props: Props) {
                 disabled={aiLoading || monthlyResults.length === 0}
                 className="bg-indigo-600 text-white hover:bg-indigo-500 font-semibold disabled:bg-slate-800 disabled:text-slate-600 gap-1.5 shadow-md shadow-indigo-600/10"
               >
-                {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                {aiLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Sparkles className="h-4 w-4" />
+                )}
                 Generate Advisor Report
               </Button>
             </div>
@@ -519,7 +566,9 @@ export function CalculatorView(props: Props) {
       {/* Footer controls */}
       <div className="flex justify-between items-center border-t border-slate-800/80 pt-6">
         <div className="text-xs text-slate-500 flex items-center gap-2">
-          <span>Benchmarked locally using <strong>Web Cryptography</strong> and native packages.</span>
+          <span>
+            Benchmarked locally using <strong>Web Cryptography</strong> and native packages.
+          </span>
         </div>
         <Button
           onClick={() =>
@@ -544,7 +593,12 @@ function ComparisonTable({
   results,
   callsPerMonth,
 }: {
-  results: (MetricsResult & { monthlyCost: number; monthlyCo2: number; monthlyWater: number; facts: { costFact: string; waterFact: string } })[];
+  results: (MetricsResult & {
+    monthlyCost: number;
+    monthlyCo2: number;
+    monthlyWater: number;
+    facts: { costFact: string; waterFact: string };
+  })[];
   callsPerMonth: number;
 }) {
   const best = useMemo(() => {
@@ -575,13 +629,27 @@ function ComparisonTable({
             <TableHeader className="bg-slate-950/40">
               <TableRow className="border-slate-800 hover:bg-transparent">
                 <TableHead className="text-slate-300 font-semibold h-11">Model</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Input Tok</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Output Tok</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Cost / Call</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Monthly Cost</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Energy (Wh)</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">Water (mL)</TableHead>
-                <TableHead className="text-right text-slate-300 font-semibold h-11">CO₂e (g)</TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Input Tok
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Output Tok
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Cost / Call
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Monthly Cost
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Energy (Wh)
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  Water (mL)
+                </TableHead>
+                <TableHead className="text-right text-slate-300 font-semibold h-11">
+                  CO₂e (g)
+                </TableHead>
                 <TableHead className="text-right text-slate-300 font-semibold h-11">TTFT</TableHead>
                 <TableHead className="text-right text-slate-300 font-semibold h-11">E2E</TableHead>
               </TableRow>
@@ -595,11 +663,16 @@ function ComparisonTable({
                 </TableRow>
               ) : (
                 results.map((r) => (
-                  <TableRow key={r.model.id} className="border-slate-800 hover:bg-slate-900/30 transition">
+                  <TableRow
+                    key={r.model.id}
+                    className="border-slate-800 hover:bg-slate-900/30 transition"
+                  >
                     <TableCell className="py-3">
                       <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-white text-sm">{r.model.displayName}</span>
+                          <span className="font-bold text-white text-sm">
+                            {r.model.displayName}
+                          </span>
                           {best.cost === r.model.id && (
                             <Badge className="bg-emerald-600/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-semibold h-5 px-1.5">
                               cheapest
@@ -616,7 +689,9 @@ function ComparisonTable({
                             </Badge>
                           )}
                         </div>
-                        <span className="text-[11px] text-slate-500 leading-none">{r.model.provider}</span>
+                        <span className="text-[11px] text-slate-500 leading-none">
+                          {r.model.provider}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-right font-mono text-xs text-slate-300">
@@ -625,8 +700,12 @@ function ComparisonTable({
                     <TableCell className="text-right font-mono text-xs text-slate-300">
                       {r.outputTokens.toLocaleString()}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs font-semibold text-slate-100">{formatUsd(r.costUsd)}</TableCell>
-                    <TableCell className="text-right font-mono text-xs font-bold text-indigo-300">{formatUsd(r.monthlyCost)}</TableCell>
+                    <TableCell className="text-right font-mono text-xs font-semibold text-slate-100">
+                      {formatUsd(r.costUsd)}
+                    </TableCell>
+                    <TableCell className="text-right font-mono text-xs font-bold text-indigo-300">
+                      {formatUsd(r.monthlyCost)}
+                    </TableCell>
                     <TableCell className="text-right font-mono text-xs text-slate-300">
                       {formatNumber(r.facilityEnergyWh, 3)}
                     </TableCell>
@@ -636,7 +715,9 @@ function ComparisonTable({
                     <TableCell className="text-right font-mono text-xs text-slate-300">
                       {formatNumber(r.co2eG, 3)}
                     </TableCell>
-                    <TableCell className="text-right font-mono text-xs text-slate-300">{r.ttftMs} ms</TableCell>
+                    <TableCell className="text-right font-mono text-xs text-slate-300">
+                      {r.ttftMs} ms
+                    </TableCell>
                     <TableCell className="text-right font-mono text-xs font-bold text-slate-100">
                       {formatNumber(r.e2eLatencyMs, 0)} ms
                     </TableCell>
@@ -693,7 +774,13 @@ function CostVsEcoChart({ results }: { results: MetricsResult[] }) {
                 tickFormatter={(v) => formatUsd(v)}
                 stroke="#64748b"
                 fontSize={10}
-                label={{ value: "Cost / call (USD)", position: "insideBottom", offset: -15, fontSize: 10, fill: "#94a3b8" }}
+                label={{
+                  value: "Cost / call (USD)",
+                  position: "insideBottom",
+                  offset: -15,
+                  fontSize: 10,
+                  fill: "#94a3b8",
+                }}
               />
               <YAxis
                 type="number"
@@ -701,7 +788,13 @@ function CostVsEcoChart({ results }: { results: MetricsResult[] }) {
                 name="CO₂e"
                 stroke="#64748b"
                 fontSize={10}
-                label={{ value: "CO₂e (g)", angle: -90, position: "insideLeft", fontSize: 10, fill: "#94a3b8" }}
+                label={{
+                  value: "CO₂e (g)",
+                  angle: -90,
+                  position: "insideLeft",
+                  fontSize: 10,
+                  fill: "#94a3b8",
+                }}
               />
               <RTooltip
                 cursor={{ strokeDasharray: "3 3" }}
@@ -745,14 +838,23 @@ function PerModelBars({ results }: { results: MetricsResult[] }) {
         <CardTitle className="text-base font-bold text-white flex items-center gap-1.5">
           <TrendingDown className="h-4.5 w-4.5 text-indigo-400" /> Cost vs Energy
         </CardTitle>
-        <p className="mt-1 text-xs text-slate-400">Comparing Cost (¢/1k calls) against Facility Energy (Wh/call).</p>
+        <p className="mt-1 text-xs text-slate-400">
+          Comparing Cost (¢/1k calls) against Facility Energy (Wh/call).
+        </p>
       </CardHeader>
       <CardContent>
         <div className="h-[280px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 40 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-              <XAxis dataKey="name" stroke="#64748b" fontSize={9} angle={-25} textAnchor="end" height={50} />
+              <XAxis
+                dataKey="name"
+                stroke="#64748b"
+                fontSize={9}
+                angle={-25}
+                textAnchor="end"
+                height={50}
+              />
               <YAxis stroke="#64748b" fontSize={10} />
               <RTooltip
                 contentStyle={{
@@ -805,9 +907,7 @@ function SimpleMarkdown({ text }: { text: string }) {
             <ul key={i} className="list-disc pl-5 space-y-1.5 text-slate-300">
               {items.map((item, idx) => {
                 const cleaned = item.replace(/^[-*]\s+/, "");
-                return (
-                  <li key={idx} dangerouslySetInnerHTML={{ __html: parseBold(cleaned) }} />
-                );
+                return <li key={idx} dangerouslySetInnerHTML={{ __html: parseBold(cleaned) }} />;
               })}
             </ul>
           );

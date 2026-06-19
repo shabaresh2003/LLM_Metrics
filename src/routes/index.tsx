@@ -7,10 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Toaster } from "@/components/ui/sonner";
 import { Button } from "@/components/ui/button";
-import {
-  CalculatorView,
-  DEFAULT_SELECTED,
-} from "@/components/calculator/CalculatorView";
+import { CalculatorView, DEFAULT_SELECTED } from "@/components/calculator/CalculatorView";
 import { ENV, MODELS } from "@/lib/metrics";
 
 export const Route = createFileRoute("/")({
@@ -22,9 +19,16 @@ export const Route = createFileRoute("/")({
         content:
           "Compare GPT, Claude and Gemini on cost, latency, energy, water and CO₂e for any prompt. Side-by-side LLM benchmarking with a downloadable report.",
       },
-      { name: "keywords", content: "LLM cost calculator, GPT vs Claude vs Gemini, AI carbon footprint, token counter, tiktoken, AI energy water" },
+      {
+        name: "keywords",
+        content:
+          "LLM cost calculator, GPT vs Claude vs Gemini, AI carbon footprint, token counter, tiktoken, AI energy water",
+      },
       { property: "og:title", content: "EcoMetrics.ai — LLM cost & carbon calculator" },
-      { property: "og:description", content: "Compare GPT, Claude and Gemini on cost, latency and environmental impact." },
+      {
+        property: "og:description",
+        content: "Compare GPT, Claude and Gemini on cost, latency and environmental impact.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "EcoMetrics.ai" },
@@ -49,10 +53,10 @@ function useScrollReveal() {
           }
         });
       },
-      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" }
+      { threshold: 0.12, rootMargin: "0px 0px -60px 0px" },
     );
     const elements = document.querySelectorAll(
-      ".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right"
+      ".scroll-reveal, .scroll-reveal-left, .scroll-reveal-right",
     );
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
@@ -84,10 +88,10 @@ function useCounter(target: number, duration = 1800, start = false) {
 ───────────────────────────────────────────────────────────────────────────── */
 function Index() {
   const [systemPrompt, setSystemPrompt] = useState(
-    "You are a helpful assistant. Answer concisely."
+    "You are a helpful assistant. Answer concisely.",
   );
   const [userPrompt, setUserPrompt] = useState(
-    "Summarize the key risks of deploying large language models in production."
+    "Summarize the key risks of deploying large language models in production.",
   );
   const [outputTokens, setOutputTokens] = useState(256);
   const [selectedIds, setSelectedIds] = useState<string[]>(DEFAULT_SELECTED);
@@ -119,15 +123,31 @@ function Index() {
             Try it for yourself
           </h2>
           <p className="text-slate-400 max-w-xl mx-auto text-sm">
-            Paste your prompt and instantly see cost, carbon, water, and energy across every major LLM.
+            Paste your prompt and instantly see cost, carbon, water, and energy across every major
+            LLM.
           </p>
         </div>
 
         <Tabs defaultValue="calculator" className="mt-8">
           <TabsList className="grid w-full max-w-md grid-cols-3 bg-slate-900 border border-slate-800 p-1 rounded-lg mx-auto">
-            <TabsTrigger value="calculator" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Calculator</TabsTrigger>
-            <TabsTrigger value="reports" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Reports</TabsTrigger>
-            <TabsTrigger value="settings" className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white">Settings</TabsTrigger>
+            <TabsTrigger
+              value="calculator"
+              className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+            >
+              Calculator
+            </TabsTrigger>
+            <TabsTrigger
+              value="reports"
+              className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+            >
+              Reports
+            </TabsTrigger>
+            <TabsTrigger
+              value="settings"
+              className="data-[state=active]:bg-indigo-600 data-[state=active]:text-white"
+            >
+              Settings
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="calculator" className="mt-6">
             <CalculatorView
@@ -205,7 +225,7 @@ function HeroSection() {
     };
     timeout = setTimeout(type, 600);
     return () => clearTimeout(timeout);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleMute = () => {
@@ -217,7 +237,6 @@ function HeroSection() {
 
   return (
     <section className="relative min-h-[96vh] flex flex-col items-center justify-center overflow-hidden px-4 text-center">
-
       {/* ── Cinematic background video ── */}
       {!videoError && (
         <div className="absolute inset-0 z-0">
@@ -249,15 +268,37 @@ function HeroSection() {
           >
             {muted ? (
               <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <line x1="23" y1="9" x2="17" y2="15" />
+                  <line x1="17" y1="9" x2="23" y2="15" />
                 </svg>
                 Unmute
               </>
             ) : (
               <>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
                 </svg>
                 Mute
               </>
@@ -276,21 +317,30 @@ function HeroSection() {
       )}
 
       {/* Floating code snippets — decorative */}
-      <div className="pointer-events-none absolute left-8 top-1/4 hidden xl:block animate-float opacity-40 z-10" style={{ animationDelay: "1s" }}>
+      <div
+        className="pointer-events-none absolute left-8 top-1/4 hidden xl:block animate-float opacity-40 z-10"
+        style={{ animationDelay: "1s" }}
+      >
         <pre className="text-[11px] text-indigo-300 font-mono border border-indigo-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
-{`const cost = tokens * price_per_1m
+          {`const cost = tokens * price_per_1m
 // $0.0024 per call`}
         </pre>
       </div>
-      <div className="pointer-events-none absolute right-8 top-1/3 hidden xl:block animate-float opacity-40 z-10" style={{ animationDelay: "3s" }}>
+      <div
+        className="pointer-events-none absolute right-8 top-1/3 hidden xl:block animate-float opacity-40 z-10"
+        style={{ animationDelay: "3s" }}
+      >
         <pre className="text-[11px] text-emerald-300 font-mono border border-emerald-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
-{`CO₂e: 0.42g per request
+          {`CO₂e: 0.42g per request
 Water: 12ml consumed`}
         </pre>
       </div>
-      <div className="pointer-events-none absolute right-12 bottom-1/3 hidden xl:block animate-float opacity-35 z-10" style={{ animationDelay: "2s" }}>
+      <div
+        className="pointer-events-none absolute right-12 bottom-1/3 hidden xl:block animate-float opacity-35 z-10"
+        style={{ animationDelay: "2s" }}
+      >
         <pre className="text-[11px] text-cyan-300 font-mono border border-cyan-500/30 rounded-lg px-3 py-2 bg-slate-900/70 backdrop-blur-sm">
-{`GPT-4o    $2.50/1M
+          {`GPT-4o    $2.50/1M
 Claude 3.5 $3.00/1M
 Gemini 1.5 $1.25/1M`}
         </pre>
@@ -314,7 +364,11 @@ Gemini 1.5 $1.25/1M`}
 
         {/* Sub */}
         <p className="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto mb-10 drop-shadow">
-          Track and optimize your impact in two ways: Our <span className="text-white font-semibold">LLM Benchmarker</span> compares AI models across cost and efficiency. Our <span className="text-emerald-300 font-semibold">Personal Carbon Tracker</span> uses Gemini AI to give personalized life-style insights. All 100% private.
+          Track and optimize your impact in two ways: Our{" "}
+          <span className="text-white font-semibold">LLM Benchmarker</span> compares AI models
+          across cost and efficiency. Our{" "}
+          <span className="text-emerald-300 font-semibold">Personal Carbon Tracker</span> uses
+          Gemini AI to give personalized life-style insights. All 100% private.
         </p>
 
         {/* CTAs */}
@@ -359,7 +413,13 @@ Gemini 1.5 $1.25/1M`}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-slate-600 animate-bounce">
         <span className="text-xs">scroll</span>
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M8 3v10M4 9l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          <path
+            d="M8 3v10M4 9l4 4 4-4"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
         </svg>
       </div>
     </section>
@@ -420,7 +480,7 @@ Gemini 1.5    $0.0012  ⚡ 1.4s`,
     title: "Get your Smart Advisor report",
     subtitle: "Data + story + recommendations.",
     description:
-      "Our local Smart Advisor generates relatable insights — \"This month's LLM spend equals 5 developer salaries\" — plus actionable optimization recommendations and a downloadable PDF.",
+      'Our local Smart Advisor generates relatable insights — "This month\'s LLM spend equals 5 developer salaries" — plus actionable optimization recommendations and a downloadable PDF.',
     code: `💡 Switching to Gemini Flash
    saves $847/mo at your scale.
 💧 Water: 120L = 2 bathtubs.`,
@@ -445,7 +505,8 @@ function UserJourneySection() {
           <span className="gradient-text-accent">in under 3 seconds</span>
         </h2>
         <p className="text-slate-400 max-w-xl mx-auto">
-          Here's exactly how EcoMetrics.ai transforms a raw API call into a clear, actionable intelligence report.
+          Here's exactly how EcoMetrics.ai transforms a raw API call into a clear, actionable
+          intelligence report.
         </p>
       </div>
 
@@ -459,13 +520,7 @@ function UserJourneySection() {
   );
 }
 
-function JourneyStep({
-  step,
-  index,
-}: {
-  step: (typeof JOURNEY_STEPS)[0];
-  index: number;
-}) {
+function JourneyStep({ step, index }: { step: (typeof JOURNEY_STEPS)[0]; index: number }) {
   const isEven = index % 2 === 0;
   const revealClass = isEven ? "scroll-reveal-left" : "scroll-reveal-right";
 
@@ -485,21 +540,31 @@ function JourneyStep({
       <div className="relative z-10 flex flex-col sm:flex-row gap-6 items-start">
         {/* Step badge */}
         <div className="shrink-0">
-          <div className={`step-badge text-white text-2xl rounded-2xl flex flex-col items-center justify-center w-16 h-16 font-black bg-gradient-to-br ${step.accent} shadow-lg`}>
+          <div
+            className={`step-badge text-white text-2xl rounded-2xl flex flex-col items-center justify-center w-16 h-16 font-black bg-gradient-to-br ${step.accent} shadow-lg`}
+          >
             {step.emoji}
           </div>
-          <div className="text-center mt-2 font-mono text-xs font-bold text-slate-600">{step.number}</div>
+          <div className="text-center mt-2 font-mono text-xs font-bold text-slate-600">
+            {step.number}
+          </div>
         </div>
 
         {/* Text */}
         <div className="flex-1 min-w-0">
-          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">{step.subtitle}</div>
+          <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
+            {step.subtitle}
+          </div>
           <h3 className="text-xl sm:text-2xl font-bold text-white mb-3">{step.title}</h3>
-          <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-4">{step.description}</p>
+          <p className="text-slate-400 text-sm sm:text-base leading-relaxed mb-4">
+            {step.description}
+          </p>
 
           {/* Code preview */}
           <div className={`rounded-xl border ${step.codeBorder} bg-slate-950/60 px-4 py-3`}>
-            <pre className={`text-xs sm:text-sm font-mono ${step.codeColor} whitespace-pre-wrap leading-relaxed`}>
+            <pre
+              className={`text-xs sm:text-sm font-mono ${step.codeColor} whitespace-pre-wrap leading-relaxed`}
+            >
               {step.code}
             </pre>
           </div>
@@ -544,7 +609,7 @@ const FEATURES = [
     icon: "🤖",
     title: "Smart Metrics Advisor",
     description:
-      "Our Smart Advisor analyzes your metrics locally and generates personalized recommendations — \"Switch to Claude Haiku for simple tasks and save $800/mo\" — not generic advice, your advice.",
+      'Our Smart Advisor analyzes your metrics locally and generates personalized recommendations — "Switch to Claude Haiku for simple tasks and save $800/mo" — not generic advice, your advice.',
     highlight: "Personalized optimization recommendations",
     accent: "from-violet-500/20 to-indigo-500/10",
     border: "hover:border-violet-500/40",
@@ -605,7 +670,8 @@ function FeatureShowcaseSection() {
             <span className="gradient-text-hero">precision and cost</span>
           </h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Six powerful tools in one dashboard — no subscriptions, no logins, no tracking. Just data.
+            Six powerful tools in one dashboard — no subscriptions, no logins, no tracking. Just
+            data.
           </p>
         </div>
 
@@ -617,7 +683,9 @@ function FeatureShowcaseSection() {
               style={{ transitionDelay: `${i * 60}ms` }}
             >
               {/* Card background */}
-              <div className={`absolute inset-0 bg-gradient-to-br ${feat.accent} pointer-events-none`} />
+              <div
+                className={`absolute inset-0 bg-gradient-to-br ${feat.accent} pointer-events-none`}
+              />
 
               <div className="relative z-10">
                 {/* Icon + tag */}
@@ -678,8 +746,13 @@ function LiveStatsSection() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setStarted(true); observer.disconnect(); } },
-      { threshold: 0.4 }
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setStarted(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.4 },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -724,12 +797,13 @@ function ReportsTab() {
       <CardContent className="space-y-3 text-sm text-slate-300">
         <p>
           Reports are generated dynamically on-demand from the Calculator tab. Click{" "}
-          <span className="font-semibold text-indigo-400">Download report (PDF)</span> after
-          running a comparison to export a clean, formatted report.
+          <span className="font-semibold text-indigo-400">Download report (PDF)</span> after running
+          a comparison to export a clean, formatted report.
         </p>
         <p>
           Calculations and report generation are executed completely inside your browser using local
-          resources. We never transfer your prompt text to external servers, securing your data privacy.
+          resources. We never transfer your prompt text to external servers, securing your data
+          privacy.
         </p>
       </CardContent>
     </Card>
@@ -741,7 +815,9 @@ function SettingsTab() {
     <div className="grid gap-6 md:grid-cols-2">
       <Card className="bg-slate-900 border-slate-800 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-white">Environmental Multipliers</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">
+            Environmental Multipliers
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-1 text-sm text-slate-300">
           <Row label="PUE (datacenter energy overhead)" value={ENV.pue.toString()} />
@@ -756,18 +832,25 @@ function SettingsTab() {
 
       <Card className="bg-slate-900 border-slate-800 shadow-xl">
         <CardHeader>
-          <CardTitle className="text-base font-semibold text-white">Local Intelligence & Privacy</CardTitle>
+          <CardTitle className="text-base font-semibold text-white">
+            Local Intelligence & Privacy
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4 text-sm text-slate-300">
           <p className="text-slate-400 text-xs">
-            TokenMetrics is now **100% LLM-free and local**. Optimization recommendations, relatable facts, and cost-benefit trade-offs are computed directly inside your browser.
+            TokenMetrics is now **100% LLM-free and local**. Optimization recommendations, relatable
+            facts, and cost-benefit trade-offs are computed directly inside your browser.
           </p>
           <div className="rounded-xl border border-indigo-500/20 bg-indigo-500/5 px-4 py-3 flex items-start gap-3">
             <span className="text-lg">🛡️</span>
             <div>
-              <div className="font-bold text-slate-200 text-xs uppercase tracking-wider">Privacy Guaranteed</div>
+              <div className="font-bold text-slate-200 text-xs uppercase tracking-wider">
+                Privacy Guaranteed
+              </div>
               <div className="text-[11px] text-slate-400 leading-normal mt-0.5">
-                No prompts, credentials, or API keys are ever transmitted to Google or any other third-party servers. All benchmarking is executed via local cryptography and static heuristics.
+                No prompts, credentials, or API keys are ever transmitted to Google or any other
+                third-party servers. All benchmarking is executed via local cryptography and static
+                heuristics.
               </div>
             </div>
           </div>
@@ -802,12 +885,18 @@ function EnhancedFooter() {
                 alt="Logo"
                 className="h-9 w-9 object-cover rounded-lg border border-slate-800 shadow"
               />
-              <div className="text-base font-bold text-white">TokenMetrics<span className="text-indigo-400">.ai</span></div>
+              <div className="text-base font-bold text-white">
+                TokenMetrics<span className="text-indigo-400">.ai</span>
+              </div>
             </div>
             <p className="text-slate-500 text-sm leading-relaxed mb-4">
-              The most comprehensive LLM cost, performance, and environmental impact calculator. Free forever. Private by design.
+              The most comprehensive LLM cost, performance, and environmental impact calculator.
+              Free forever. Private by design.
             </p>
-            <Badge variant="outline" className="border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs">
+            <Badge
+              variant="outline"
+              className="border-emerald-500/20 bg-emerald-500/5 text-emerald-400 text-xs"
+            >
               🛡️ Privacy-first · No tracking
             </Badge>
           </div>
@@ -822,7 +911,9 @@ function EnhancedFooter() {
                 { label: "Calculator", href: "#calculator" },
               ].map(({ label, href }) => (
                 <li key={href}>
-                  <a href={href} className="hover:text-slate-200 transition-colors">{label}</a>
+                  <a href={href} className="hover:text-slate-200 transition-colors">
+                    {label}
+                  </a>
                 </li>
               ))}
             </ul>
@@ -844,7 +935,8 @@ function EnhancedFooter() {
         <div className="border-t border-slate-800/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-600">
             © {new Date().getFullYear()} EcoMetrics.ai · Built by{" "}
-            <span className="text-slate-400 font-semibold">shabaresh</span> · Open-source benchmarking
+            <span className="text-slate-400 font-semibold">shabaresh</span> · Open-source
+            benchmarking
           </p>
           <p className="text-xs text-slate-600">
             All processing client-side · No prompt data stored · No analytics

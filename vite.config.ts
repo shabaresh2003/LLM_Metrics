@@ -44,6 +44,8 @@ export default defineConfig(({ command }) => ({
       },
     }),
     react(),
-    (command === "build" && process.env.DEPLOY_TARGET !== "node") ? cloudflare({ viteEnvironment: { name: "ssr" } }) : undefined,
+    command === "build" && process.env.DEPLOY_TARGET !== "node"
+      ? cloudflare({ viteEnvironment: { name: "ssr" } })
+      : undefined,
   ].filter(Boolean),
 }));

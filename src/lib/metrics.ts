@@ -77,7 +77,7 @@ export function computeMetrics({ model, inputTokens, outputTokens }: MetricsInpu
   const co2eG = facilityEnergyKWh * ENV.co2IntensityGPerKWh;
 
   const ttftMs = inputTokens > 0 ? model.ttftMs : 0;
-  const e2eLatencyMs = totalTokens > 0 ? (ttftMs + (outputTokens / model.tokensPerSecond) * 1000) : 0;
+  const e2eLatencyMs = totalTokens > 0 ? ttftMs + (outputTokens / model.tokensPerSecond) * 1000 : 0;
 
   return {
     model,
@@ -154,37 +154,53 @@ function replacePlaceholders(fact: string, val: number): string {
   else if (fact.includes("glamping")) divisor = 150;
   else if (fact.includes("suitcases")) divisor = 400;
   else if (fact.includes("printers")) divisor = 350;
-  else if (fact.includes("MacBook")) { divisor = 1600; decimals = 1; }
-  else if (fact.includes("scooter")) { divisor = 5000; decimals = 1; }
-  else if (fact.includes("smartwatches")) divisor = 2000;
+  else if (fact.includes("MacBook")) {
+    divisor = 1600;
+    decimals = 1;
+  } else if (fact.includes("scooter")) {
+    divisor = 5000;
+    decimals = 1;
+  } else if (fact.includes("smartwatches")) divisor = 2000;
   else if (fact.includes("satellite internet")) divisor = 1200;
   else if (fact.includes("sofas")) divisor = 2500;
   else if (fact.includes("monitors")) divisor = 3500;
-  else if (fact.includes("violins")) { divisor = 4000; decimals = 1; }
-  else if (fact.includes("surfboard")) divisor = 1500;
-  else if (fact.includes("telescopes")) { divisor = 7000; decimals = 1; }
-  else if (fact.includes("knife sets")) divisor = 2000;
+  else if (fact.includes("violins")) {
+    divisor = 4000;
+    decimals = 1;
+  } else if (fact.includes("surfboard")) divisor = 1500;
+  else if (fact.includes("telescopes")) {
+    divisor = 7000;
+    decimals = 1;
+  } else if (fact.includes("knife sets")) divisor = 2000;
   else if (fact.includes("developer")) divisor = 1000;
   else if (fact.includes("co-working")) divisor = 3000;
-  else if (fact.includes("Tesla")) { divisor = 50000; decimals = 1; }
-  else if (fact.includes("college")) divisor = 2500;
+  else if (fact.includes("Tesla")) {
+    divisor = 50000;
+    decimals = 1;
+  } else if (fact.includes("college")) divisor = 2500;
   else if (fact.includes("flights")) divisor = 5000;
-  else if (fact.includes("mortgage")) { divisor = 20000; decimals = 2; }
-  else if (fact.includes("film production")) { divisor = 100000; decimals = 2; }
-  else if (fact.includes("ER visits")) divisor = 1500;
+  else if (fact.includes("mortgage")) {
+    divisor = 20000;
+    decimals = 2;
+  } else if (fact.includes("film production")) {
+    divisor = 100000;
+    decimals = 2;
+  } else if (fact.includes("ER visits")) divisor = 1500;
   else if (fact.includes("homes")) divisor = 100;
-
   // Water map
   else if (fact.includes("water bottles")) divisor = 0.5;
   else if (fact.includes("houseplant")) divisor = 0.3;
   else if (fact.includes("glasses")) divisor = 0.25;
   else if (fact.includes("juice boxes")) divisor = 0.3;
   else if (fact.includes("showers")) divisor = 65;
-  else if (fact.includes("drinking water") && fact.includes("people") && !fact.includes("supply")) divisor = 2;
+  else if (fact.includes("drinking water") && fact.includes("people") && !fact.includes("supply"))
+    divisor = 2;
   else if (fact.includes("buckets")) divisor = 10;
   else if (fact.includes("sunflower")) divisor = 1.5;
-  else if (fact.includes("swimming pool") && fact.includes("%")) { divisor = 2500000 / 100; decimals = 4; }
-  else if (fact.includes("pasta")) divisor = 5;
+  else if (fact.includes("swimming pool") && fact.includes("%")) {
+    divisor = 2500000 / 100;
+    decimals = 4;
+  } else if (fact.includes("pasta")) divisor = 5;
   else if (fact.includes("dogs")) divisor = 5;
   else if (fact.includes("hand-washing")) divisor = 7;
   else if (fact.includes("bathtub")) divisor = 150;
@@ -194,26 +210,40 @@ function replacePlaceholders(fact: string, val: number): string {
   else if (fact.includes("alligators")) divisor = 500;
   else if (fact.includes("concrete")) divisor = 200;
   else if (fact.includes("kegs")) divisor = 8;
-  else if (fact.includes("wheat")) { divisor = 500; decimals = 1; }
-  else if (fact.includes("T-shirt")) divisor = 2500;
-  else if (fact.includes("coffee")) divisor = 140;
+  else if (fact.includes("wheat")) {
+    divisor = 500;
+    decimals = 1;
+  } else if (fact.includes("T-shirt")) divisor = 2500;
+  else if (fact.includes("coffee beans")) divisor = 140;
   else if (fact.includes("cows")) divisor = 3500;
-  else if (fact.includes("beef")) { divisor = 15000; decimals = 1; }
-  else if (fact.includes("swimming pools") && !fact.includes("%")) { divisor = 2500; decimals = 1; }
-  else if (fact.includes("corn")) divisor = 1000;
-  else if (fact.includes("airline seats")) { divisor = 50000; decimals = 2; }
-  else if (fact.includes("drinking water supply") && fact.includes("people")) { divisor = 2 * 365; decimals = 1; }
-  else if (fact.includes("lakes")) divisor = 1000000;
+  else if (fact.includes("beef")) {
+    divisor = 15000;
+    decimals = 1;
+  } else if (fact.includes("swimming pools") && !fact.includes("%")) {
+    divisor = 2500;
+    decimals = 1;
+  } else if (fact.includes("corn")) divisor = 1000;
+  else if (fact.includes("airline seats")) {
+    divisor = 50000;
+    decimals = 2;
+  } else if (fact.includes("drinking water supply") && fact.includes("people")) {
+    divisor = 2 * 365;
+    decimals = 1;
+  } else if (fact.includes("lakes")) divisor = 1000000;
   else if (fact.includes("fire truck")) divisor = 10000;
   else if (fact.includes("sailboats")) divisor = 500000;
   else if (fact.includes("swimming pools")) divisor = 2500;
 
   const nVal = val / divisor;
-  const nStr = decimals === 0 ? Math.max(1, Math.round(nVal)).toLocaleString() : nVal.toFixed(decimals);
+  const nStr =
+    decimals === 0 ? Math.max(1, Math.round(nVal)).toLocaleString() : nVal.toFixed(decimals);
   return fact.replace("{n}", nStr);
 }
 
-export function generateRelatableFacts(monthlyCost: number, monthlyWaterMl: number): RelatableFacts {
+export function generateRelatableFacts(
+  monthlyCost: number,
+  monthlyWaterMl: number,
+): RelatableFacts {
   const monthlyWaterL = monthlyWaterMl / 1000;
 
   // ─── COST FACTS ────────────────────────────────────────────────────────────
@@ -280,7 +310,7 @@ export function generateLocalAdvisorInsights(
     facts: RelatableFacts;
   })[],
   callsPerMonth: number,
-  outputTokens: number
+  outputTokens: number,
 ): string {
   if (results.length === 0) {
     return "No models benchmarked. Please select at least one model to generate insights.";
@@ -301,7 +331,8 @@ export function generateLocalAdvisorInsights(
   const avgCost = results.reduce((sum, r) => sum + r.monthlyCost, 0) / results.length;
   const avgWaterL = results.reduce((sum, r) => sum + r.monthlyWater, 0) / results.length / 1000;
   const avgCo2G = results.reduce((sum, r) => sum + r.monthlyCo2, 0) / results.length;
-  const avgEnergyWh = results.reduce((sum, r) => sum + r.facilityEnergyWh, 0) / results.length * callsPerMonth;
+  const avgEnergyWh =
+    (results.reduce((sum, r) => sum + r.facilityEnergyWh, 0) / results.length) * callsPerMonth;
 
   // Recommendations builder
   const costRecs: string[] = [];
@@ -319,14 +350,19 @@ export function generateLocalAdvisorInsights(
     ecoRecs.push(...factsData.recommendations.highCarbon);
   }
   if (ecoRecs.length === 0) {
-    ecoRecs.push("Your environmental footprint is relatively small. You can keep it optimal by using smaller models or prompt caching.");
+    ecoRecs.push(
+      "Your environmental footprint is relatively small. You can keep it optimal by using smaller models or prompt caching.",
+    );
   }
 
   // Savings math
   const monthlySavings = mostExpensive.monthlyCost - cheapest.monthlyCost;
-  const savingsPercent = mostExpensive.monthlyCost > 0
-    ? Math.round(((mostExpensive.monthlyCost - cheapest.monthlyCost) / mostExpensive.monthlyCost) * 100)
-    : 0;
+  const savingsPercent =
+    mostExpensive.monthlyCost > 0
+      ? Math.round(
+          ((mostExpensive.monthlyCost - cheapest.monthlyCost) / mostExpensive.monthlyCost) * 100,
+        )
+      : 0;
 
   let tradeOffText = "";
   if (results.length > 1) {
@@ -358,14 +394,14 @@ export function generateLocalAdvisorInsights(
 - **Trade-off Analysis**: ${tradeOffText}
 
 #### Actionable Optimization Checklist:
-${costRecs.map(r => `- ${r}`).join("\n")}
+${costRecs.map((r) => `- ${r}`).join("\n")}
 
 ### Environmental Impact Assessment
 - **Carbon Intensity**: **${greenest.model.displayName}** is the greenest model selected, emitting just **${formatNumber(greenest.monthlyCo2, 2)} g CO₂e/month**.
 - **Total Portfolio Footprint**: Across your selections, average monthly resource demand is **${formatNumber(avgWaterL, 1)} Liters** of water, **${formatNumber(avgCo2G / 1000, 2)} kg CO₂e** greenhouse gases, and **${formatNumber(avgEnergyWh / 1000, 2)} kWh** of power.
 
 #### Eco-Optimization Recommendations:
-${ecoRecs.map(r => `- ${r}`).join("\n")}
+${ecoRecs.map((r) => `- ${r}`).join("\n")}
 
 ### Relatable Real-World Facts
 - **Cost Aspect**: The cost of running **${cheapest.model.displayName}** is *${costAnalogy.replace(/^[^\s]+\s+/, "")}*

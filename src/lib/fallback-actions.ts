@@ -11,9 +11,10 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
     actions.push({
       id: "fallback-transport-ev",
       title: "Consider an EV or Carpool",
-      description: "You drive significantly more than average. Transitioning to an Electric Vehicle or carpooling twice a week can drastically reduce your emissions.",
-      annualSavingsKg: Math.round((inputs.transport.carMilesPerWeek * 52 * 0.27785) * 0.4),
-      effort: "hard"
+      description:
+        "You drive significantly more than average. Transitioning to an Electric Vehicle or carpooling twice a week can drastically reduce your emissions.",
+      annualSavingsKg: Math.round(inputs.transport.carMilesPerWeek * 52 * 0.27785 * 0.4),
+      effort: "hard",
     });
   } else if (inputs.transport.carMilesPerWeek > 20) {
     actions.push({
@@ -21,7 +22,7 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
       title: "Replace Short Trips with Biking",
       description: "For trips under 2 miles, consider walking or biking instead of driving.",
       annualSavingsKg: 150,
-      effort: "medium"
+      effort: "medium",
     });
   }
 
@@ -29,9 +30,10 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
     actions.push({
       id: "fallback-transport-fly",
       title: "Reduce Air Travel",
-      description: "Flights are highly carbon-intensive. Try to replace at least one flight per year with a train journey or a staycation.",
+      description:
+        "Flights are highly carbon-intensive. Try to replace at least one flight per year with a train journey or a staycation.",
       annualSavingsKg: 500,
-      effort: "hard"
+      effort: "hard",
     });
   }
 
@@ -40,9 +42,10 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
     actions.push({
       id: "fallback-energy-solar",
       title: "Switch to Renewable Energy",
-      description: "Your household energy consumption is high. Consider switching your tariff to a 100% renewable energy provider or installing solar panels.",
-      annualSavingsKg: Math.round((inputs.energy.electricityKwhPerMonth * 12 * 0.13096) * 0.8),
-      effort: "hard"
+      description:
+        "Your household energy consumption is high. Consider switching your tariff to a 100% renewable energy provider or installing solar panels.",
+      annualSavingsKg: Math.round(inputs.energy.electricityKwhPerMonth * 12 * 0.13096 * 0.8),
+      effort: "hard",
     });
   } else {
     actions.push({
@@ -50,7 +53,7 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
       title: "Install a Smart Thermostat",
       description: "Optimize your heating and cooling schedules to reduce phantom energy draw.",
       annualSavingsKg: 120,
-      effort: "medium"
+      effort: "medium",
     });
   }
 
@@ -59,17 +62,19 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
     actions.push({
       id: "fallback-diet-meatless",
       title: "Adopt Meatless Mondays",
-      description: "Substituting meat for plant-based alternatives just one day a week can lower your food footprint significantly.",
+      description:
+        "Substituting meat for plant-based alternatives just one day a week can lower your food footprint significantly.",
       annualSavingsKg: 300,
-      effort: "easy"
+      effort: "easy",
     });
   } else if (inputs.diet.dietType === "meat_low") {
     actions.push({
       id: "fallback-diet-pescatarian",
       title: "Try a Pescatarian Diet",
-      description: "You already eat low amounts of meat. Cutting it out entirely for sustainable fish can reduce your footprint further.",
+      description:
+        "You already eat low amounts of meat. Cutting it out entirely for sustainable fish can reduce your footprint further.",
       annualSavingsKg: 150,
-      effort: "medium"
+      effort: "medium",
     });
   }
 
@@ -78,9 +83,10 @@ export function getFallbackActions(inputs: CarbonInputs): RecommendationAction[]
     actions.push({
       id: "fallback-shopping-secondhand",
       title: "Buy Second-Hand Fast Fashion",
-      description: "Your consumption footprint is high. Buying refurbished electronics or second-hand clothes helps bypass manufacturing emissions.",
+      description:
+        "Your consumption footprint is high. Buying refurbished electronics or second-hand clothes helps bypass manufacturing emissions.",
       annualSavingsKg: 400,
-      effort: "medium"
+      effort: "medium",
     });
   }
 
