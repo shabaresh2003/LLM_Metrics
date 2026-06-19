@@ -1,7 +1,7 @@
 {
   "updated": "2025-05-27",
   "currency": "USD",
-  "notes": "Prices are USD per 1,000,000 tokens. Some next-gen models (GPT-5.x, Claude 4.x, Gemini 3.x) use vendor-published or extrapolated estimates and may change — edit this file to keep them current.",
+  "notes": "Prices are USD per 1,000,000 tokens. Some next-gen models (GPT-5.x, Claude 4.x, Gemini 3.x) use vendor-published or extrapolated estimates and may change \u2014 edit this file to keep them current.",
   "models": [
     {
       "id": "gpt-4o",
@@ -23,7 +23,7 @@
       "encoding": "o200k_base",
       "inputPricePerMTok": 0.15,
       "outputPricePerMTok": 0.6,
-      "energyPerTokenWh": 0.00008,
+      "energyPerTokenWh": 8e-05,
       "ttftMs": 300,
       "tokensPerSecond": 180
     },
@@ -83,7 +83,7 @@
       "encoding": "o200k_base",
       "inputPricePerMTok": 0.1,
       "outputPricePerMTok": 0.4,
-      "energyPerTokenWh": 0.00006,
+      "energyPerTokenWh": 6e-05,
       "ttftMs": 220,
       "tokensPerSecond": 260
     },
@@ -131,7 +131,7 @@
       "encoding": "o200k_base",
       "inputPricePerMTok": 0.12,
       "outputPricePerMTok": 0.48,
-      "energyPerTokenWh": 0.00006,
+      "energyPerTokenWh": 6e-05,
       "ttftMs": 210,
       "tokensPerSecond": 280
     },
@@ -191,7 +191,7 @@
       "encoding": "o200k_base",
       "inputPricePerMTok": 0.2,
       "outputPricePerMTok": 0.6,
-      "energyPerTokenWh": 0.00009,
+      "energyPerTokenWh": 9e-05,
       "ttftMs": 260,
       "tokensPerSecond": 220
     },
@@ -215,7 +215,7 @@
       "encoding": "cl100k_base",
       "inputPricePerMTok": 0.8,
       "outputPricePerMTok": 4.0,
-      "energyPerTokenWh": 0.00009,
+      "energyPerTokenWh": 9e-05,
       "ttftMs": 350,
       "tokensPerSecond": 160
     },
@@ -335,7 +335,7 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.075,
       "outputPricePerMTok": 0.3,
-      "energyPerTokenWh": 0.00007,
+      "energyPerTokenWh": 7e-05,
       "ttftMs": 280,
       "tokensPerSecond": 200
     },
@@ -347,11 +347,10 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.1,
       "outputPricePerMTok": 0.4,
-      "energyPerTokenWh": 0.00008,
+      "energyPerTokenWh": 8e-05,
       "ttftMs": 250,
       "tokensPerSecond": 220
-    }
-    ,
+    },
     {
       "id": "gemini-2.5-pro",
       "provider": "Google",
@@ -372,7 +371,7 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.15,
       "outputPricePerMTok": 0.6,
-      "energyPerTokenWh": 0.00008,
+      "energyPerTokenWh": 8e-05,
       "ttftMs": 240,
       "tokensPerSecond": 230
     },
@@ -384,7 +383,7 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.05,
       "outputPricePerMTok": 0.2,
-      "energyPerTokenWh": 0.00005,
+      "energyPerTokenWh": 5e-05,
       "ttftMs": 200,
       "tokensPerSecond": 280
     },
@@ -396,7 +395,7 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.2,
       "outputPricePerMTok": 0.8,
-      "energyPerTokenWh": 0.00008,
+      "energyPerTokenWh": 8e-05,
       "ttftMs": 230,
       "tokensPerSecond": 240
     },
@@ -408,7 +407,7 @@
       "encoding": "gemini",
       "inputPricePerMTok": 0.04,
       "outputPricePerMTok": 0.16,
-      "energyPerTokenWh": 0.00004,
+      "energyPerTokenWh": 4e-05,
       "ttftMs": 180,
       "tokensPerSecond": 320
     },
@@ -435,6 +434,30 @@
       "energyPerTokenWh": 0.0003,
       "ttftMs": 500,
       "tokensPerSecond": 105
+    },
+    {
+      "id": "nanoGPT",
+      "provider": "Open Source",
+      "displayName": "nanoGPT (124M)",
+      "class": "small",
+      "encoding": "cl100k_base",
+      "inputPricePerMTok": 0.0,
+      "outputPricePerMTok": 0.0,
+      "energyPerTokenWh": 4e-05,
+      "ttftMs": 50,
+      "tokensPerSecond": 400
+    },
+    {
+      "id": "TinyLlama",
+      "provider": "Open Source",
+      "displayName": "TinyLlama (1.1B)",
+      "class": "small",
+      "encoding": "cl100k_base",
+      "inputPricePerMTok": 0.0,
+      "outputPricePerMTok": 0.0,
+      "energyPerTokenWh": 6e-05,
+      "ttftMs": 80,
+      "tokensPerSecond": 350
     }
   ],
   "environment": {

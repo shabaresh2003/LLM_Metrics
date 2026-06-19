@@ -1,0 +1,14 @@
+{
+  "electricity_kg_per_kwh": 0.13096,
+  "car_kg_per_mile": 0.27785,
+  "flight_kg_per_km": 0.14253,
+  "diet_kg_per_day": {
+    "meat_heavy": 1.2,
+    "meat_medium": 0.8,
+    "meat_low": 0.6,
+    "pescatarian": 0.5,
+    "vegetarian": 0.45,
+    "vegan": 0.35
+  },
+  "shopping_kg_per_inr": 0.003
+}

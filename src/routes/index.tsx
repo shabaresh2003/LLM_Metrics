@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,18 +16,18 @@ import { ENV, MODELS } from "@/lib/metrics";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "TokenMetrics.ai — LLM cost, performance & carbon calculator" },
+      { title: "EcoMetrics.ai — LLM cost, performance & carbon calculator" },
       {
         name: "description",
         content:
           "Compare GPT, Claude and Gemini on cost, latency, energy, water and CO₂e for any prompt. Side-by-side LLM benchmarking with a downloadable report.",
       },
       { name: "keywords", content: "LLM cost calculator, GPT vs Claude vs Gemini, AI carbon footprint, token counter, tiktoken, AI energy water" },
-      { property: "og:title", content: "TokenMetrics.ai — LLM cost & carbon calculator" },
+      { property: "og:title", content: "EcoMetrics.ai — LLM cost & carbon calculator" },
       { property: "og:description", content: "Compare GPT, Claude and Gemini on cost, latency and environmental impact." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "TokenMetrics.ai" },
+      { name: "twitter:title", content: "EcoMetrics.ai" },
       { name: "twitter:description", content: "LLM cost, performance & carbon calculator." },
       { rel: "canonical", href: "/" } as never,
     ],
@@ -96,10 +96,7 @@ function Index() {
   useScrollReveal();
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white overflow-x-hidden">
-      <Toaster richColors position="top-right" />
-      <Header />
-
+    <>
       {/* ── Hero ── */}
       <HeroSection />
 
@@ -156,68 +153,12 @@ function Index() {
       </section>
 
       <EnhancedFooter />
-    </div>
+    </>
   );
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   Header
-───────────────────────────────────────────────────────────────────────────── */
-function Header() {
-  const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  return (
-    <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "border-b border-slate-800/80 bg-slate-950/90 backdrop-blur shadow-lg shadow-slate-950/50"
-          : "bg-transparent border-b border-transparent"
-      }`}
-    >
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <div className="flex items-center gap-2.5">
-          <img
-            src="/logo.png"
-            alt="Logo"
-            className="h-9 w-9 object-cover rounded-lg border border-slate-800 shadow"
-          />
-          <div>
-            <div className="text-base font-bold tracking-tight text-white">
-              TokenMetrics<span className="text-indigo-400">.ai</span>
-            </div>
-            <div className="text-[10px] uppercase tracking-wider text-slate-500 font-semibold">
-              LLM Cost · Carbon · Intelligence
-            </div>
-          </div>
-        </div>
-
-        {/* Nav */}
-        <nav className="hidden md:flex items-center gap-6 text-sm text-slate-400">
-          <a href="#how-it-works" className="hover:text-white transition-colors">How it works</a>
-          <a href="#features" className="hover:text-white transition-colors">Features</a>
-          <a href="#calculator" className="hover:text-white transition-colors">Calculator</a>
-        </nav>
-
-        {/* Right badges */}
-        <div className="flex items-center gap-3">
-          <Badge variant="outline" className="hidden sm:flex border-emerald-500/30 text-emerald-400 font-medium text-xs">
-            🛡️ Privacy-first
-          </Badge>
-          <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 font-medium text-xs">
-            v1.1 · {MODELS.length} models
-          </Badge>
-        </div>
-      </div>
-    </header>
-  );
-}
 
 /* ─────────────────────────────────────────────────────────────────────────────
    Hero Section  (with cinematic background video)
@@ -230,9 +171,9 @@ function HeroSection() {
 
   const phrases = [
     "every API call.",
-    "every token you send.",
+    "every commute you make.",
     "every model you choose.",
-    "your LLM carbon footprint.",
+    "your personal carbon footprint.",
     "your AI water usage.",
   ];
   const phraseIndex = useRef(0);
@@ -373,32 +314,26 @@ Gemini 1.5 $1.25/1M`}
 
         {/* Sub */}
         <p className="text-lg sm:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto mb-10 drop-shadow">
-          Compare GPT-4o, Claude 3.5, Gemini 1.5 and more — side-by-side on{" "}
-          <span className="text-white font-semibold">cost</span>,{" "}
-          <span className="text-white font-semibold">latency</span>,{" "}
-          <span className="text-emerald-300 font-semibold">carbon</span>,{" "}
-          <span className="text-cyan-300 font-semibold">water</span>, and{" "}
-          <span className="text-violet-300 font-semibold">energy</span>.{" "}
-          Instantly. Privately. Free.
+          Track and optimize your impact in two ways: Our <span className="text-white font-semibold">LLM Benchmarker</span> compares AI models across cost and efficiency. Our <span className="text-emerald-300 font-semibold">Personal Carbon Tracker</span> uses Gemini AI to give personalized life-style insights. All 100% private.
         </p>
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row items-center gap-4 justify-center mb-14">
-          <a href="#calculator">
+          <Link to="/carbon-tracker">
             <Button
               size="lg"
-              className="step-badge text-white font-semibold text-base px-8 py-3 h-auto rounded-xl hover:opacity-90 transition-opacity shadow-xl shadow-indigo-500/30 hover:shadow-indigo-500/50"
+              className="step-badge bg-emerald-600 text-white font-semibold text-base px-8 py-3 h-auto rounded-xl hover:bg-emerald-500 transition-opacity shadow-xl shadow-emerald-500/30 hover:shadow-emerald-500/50"
             >
-              ⚡ Try the Calculator
+              🌍 Personal Carbon Tracker
             </Button>
-          </a>
-          <a href="#how-it-works">
+          </Link>
+          <a href="#calculator">
             <Button
               variant="outline"
               size="lg"
-              className="border-white/20 text-white hover:border-indigo-400 hover:text-white font-semibold text-base px-8 py-3 h-auto rounded-xl transition-all bg-slate-900/40 backdrop-blur"
+              className="border-indigo-500/30 text-indigo-300 hover:border-indigo-400 hover:text-white font-semibold text-base px-8 py-3 h-auto rounded-xl transition-all bg-indigo-950/40 backdrop-blur"
             >
-              See how it works →
+              ⚡ LLM Calculator
             </Button>
           </a>
         </div>
@@ -510,7 +445,7 @@ function UserJourneySection() {
           <span className="gradient-text-accent">in under 3 seconds</span>
         </h2>
         <p className="text-slate-400 max-w-xl mx-auto">
-          Here's exactly how TokenMetrics.ai transforms a raw API call into a clear, actionable intelligence report.
+          Here's exactly how EcoMetrics.ai transforms a raw API call into a clear, actionable intelligence report.
         </p>
       </div>
 
@@ -763,7 +698,7 @@ function LiveStatsSection() {
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-2">
                 By the numbers
               </h2>
-              <p className="text-slate-400 text-sm">What TokenMetrics.ai brings to your workflow</p>
+              <p className="text-slate-400 text-sm">What EcoMetrics.ai brings to your workflow</p>
             </div>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 divide-x divide-slate-800/50">
               {STATS.map((stat) => (
@@ -908,7 +843,7 @@ function EnhancedFooter() {
         {/* Bottom bar */}
         <div className="border-t border-slate-800/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-slate-600">
-            © {new Date().getFullYear()} TokenMetrics.ai · Built by{" "}
+            © {new Date().getFullYear()} EcoMetrics.ai · Built by{" "}
             <span className="text-slate-400 font-semibold">shabaresh</span> · Open-source benchmarking
           </p>
           <p className="text-xs text-slate-600">

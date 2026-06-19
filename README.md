@@ -1,62 +1,74 @@
-# TokenMetrics.ai — LLM Cost, Performance & Carbon Calculator
+# EcoMetrics.ai — Personal & AI Carbon Footprint Calculator
 
-TokenMetrics.ai is a side-by-side benchmarking and playground calculator for evaluating Large Language Models (LLMs). It quantifies the financial cost, end-to-end latency, energy consumption, water footprint, and CO₂e carbon emissions for commercial LLM queries (GPT, Claude, and Gemini).
+EcoMetrics.ai is a comprehensive, privacy-first carbon calculation engine designed to help users track and reduce their carbon footprint. The application provides localized, science-backed environmental analytics for daily lifestyle choices (transport, energy, diet, shopping) alongside detailed environmental impact benchmarking for Large Language Models (LLMs).
 
-All calculations run locally in your browser (privacy-first).
+While our primary focus is on robust **Carbon Calculation** and actionable emission reductions, the application also includes multidimensional benchmarking for AI models—calculating financial costs, latency, water usage, and energy overhead as secondary metrics.
 
----
-
-## Key Features
-
-- **Side-by-Side Comparison:** Compare GPT-4o, Claude 3.5 Sonnet, Gemini 1.5 Pro, and many more models simultaneously.
-- **Multidimensional Benchmarking:**
-  - **Financial Cost (USD):** Calculated per million tokens based on current vendor API pricing.
-  - **Latency (TTFT & E2E):** Estimates prefill and autoregressive token generation durations.
-  - **Energy (Wh):** Empirical hardware-level energy estimates (Jegham et al. 2025).
-  - **Water footprint (mL):** Scope-1 (cooling) and Scope-2 (power-generation) water footprint models (Li et al. 2023).
-  - **CO₂e Emissions (g):** Datacenter electricity draw mapped to local grid carbon intensity factors.
-- **File Upload:** Upload text files or PDFs to analyze prompt tokens and calculate footprints immediately.
-- **Interactive Graphs:** Dynamic charts showing cost vs. eco-efficiency trade-offs and energy comparisons.
-- **PDF Report Export:** Download structured evaluation reports directly from the browser.
+### Why AI Metrics?
+In a world where everyone is rapidly adopting and using Large Language Models (LLMs) daily, very few people are aware of the hidden, actual costs of generating responses. Beyond financial API costs, two of the most significant and often invisible environmental impacts of AI are its massive carbon footprint and extensive water usage for cooling data centers. EcoMetrics.ai sheds light on these invisible costs so developers and consumers can make eco-conscious model choices.
 
 ---
 
-## Technology Stack
+## 🌍 Core Features
+
+### 1. Personal Carbon Tracker
+A personalized assessment engine that calculates an individual's carbon footprint across four key sectors:
+- **Transport:** Footprints calculated per mile driven or km flown.
+- **Energy:** Domestic electricity consumption scaled by household size.
+- **Diet:** Dietary choices ranging from heavy meat consumption to vegan.
+- **Shopping:** Monthly expenditure converted to carbon equivalents.
+- **AI Recommendations:** Context-aware, personalized emission reduction actions generated using Gemini 2.5 Flash.
+
+### 2. AI Model Benchmarking
+Compare the environmental and financial costs of queries across Frontier and Small Language Models:
+- **Carbon Emissions (g CO₂e):** Datacenter electricity draw mapped to grid carbon intensity.
+- **Energy (Wh):** Empirical hardware-level energy estimates.
+- **Water Footprint (mL):** Scope-1 (cooling) and Scope-2 (power-generation) water footprint models.
+- **Financial Cost (USD) & Latency:** (Secondary) Calculated per million tokens and time-to-first-token (TTFT).
+
+---
+
+## 🔬 Calculation Methodology & References
+
+The calculator avoids mocked data and relies on strictly extracted numbers from official academic and government reports.
+
+### References
+1. **UK Government GHG Conversion Factors (2026):**
+   - Official baseline for electricity (`0.13096 kg CO₂e / kWh`), passenger vehicles (`0.27785 kg CO₂e / mile`), and business travel air (`0.14253 kg CO₂e / km`).
+   - Source: *UK Government GHG Conversion Factors for Company Reporting (DEFRA).*
+   
+2. **Household Carbon Footprint of India (Policy Brief 53):**
+   - Provides localized footprint targets and diet models, tracking the average Indian per-capita emission (~1472 kg CO₂e/year) and extremely low dietary footprints (~0.56 kg CO₂e/day).
+   - Source: *Nautiyal, Goswami, Kishan & Premkumar (May 2023).*
+
+3. **Small Language Model Energy Estimation:**
+   - Real-world energy and latency profiles specifically for **nanoGPT (124M)** and **TinyLlama (1.1B)** running on hardware like Nvidia 3060Ti and Apple M1.
+   - Source: *"Assessing the carbon footprint of language models" (Reference PDF).*
+
+4. **Frontier Model Footprints:**
+   - **Energy Estimations:** *Jegham et al. (2025) "How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference."*
+   - **Water Footprint Estimations:** *Li et al. (2023) "Making AI Less 'Thirsty': Uncovering and Addressing the Secret Water Footprint of AI Models."*
+
+### Key Formulas
+- **Personal Footprint (e.g. Energy):** 
+  $$\text{Energy Carbon} = \frac{\text{kWh} \times 12}{\text{Household Size}} \times 0.13096 \text{ kg CO₂e/kWh}$$
+- **AI Carbon Footprint:**
+  $$\text{CO}_2\text{e (g)} = \text{Total Tokens} \times \text{Energy Per Token} \times \text{PUE} \times \text{Grid Carbon Intensity}$$
+
+---
+
+## 🛠 Technology Stack
 
 - **Core Framework:** React 19, TypeScript
-- **Routing & Server Rendering:** TanStack Start (TanStack Router)
+- **Routing & SSR:** TanStack Start
 - **Styling:** TailwindCSS
 - **Charts:** Recharts
 - **Bundler:** Vite
-- **Deployment Ready:** Cloudflare Pages (via `@cloudflare/vite-plugin`)
+- **AI Advisor Backend:** Google Generative AI (`gemini-2.5-flash`)
 
 ---
 
-## Calculation Methodology
-
-### 1. Cost (USD)
-$$\text{Cost} = \left(\frac{\text{Input Tokens}}{1,000,000} \times \text{Input Price / MTok}\right) + \left(\frac{\text{Output Tokens}}{1,000,000} \times \text{Output Price / MTok}\right)$$
-
-### 2. Latency (ms)
-- **Time to First Token (TTFT):** Baseline prompt prefill latency (model specific).
-- **End-to-End (E2E) Latency:**
-  $$\text{E2E Latency} = \text{TTFT} + \left(\frac{\text{Output Tokens}}{\text{Tokens/Second}} \times 1000\right)$$
-
-### 3. Energy Consumption (Wh)
-- **Facility Energy:** Accounts for datacenter overhead using Power Usage Effectiveness (PUE):
-  $$\text{Facility Energy} = \text{Total Tokens} \times \text{Energy Per Token (at chip)} \times \text{PUE}$$
-
-### 4. Water Footprint (mL)
-Calculates direct on-site cooling evaporation and indirect power generation water consumption:
-$$\text{Water (mL)} = \text{Facility Energy (kWh)} \times \left(\text{WUE}_{\text{on-site}} + \text{WUE}_{\text{electricity}}\right) \times 1000$$
-
-### 5. Carbon Emissions (g CO₂e)
-Standard Greenhouse Gas (GHG) Protocol Scope 2 location-based calculation:
-$$\text{CO}_2\text{e (g)} = \text{Facility Energy (kWh)} \times \text{Grid Carbon Intensity (g/kWh)}$$
-
----
-
-## Local Setup
+## 🚀 Local Setup
 
 ### Prerequisites
 - Node.js (v20.19.0+ or v22.12.0+)
@@ -75,13 +87,7 @@ $$\text{CO}_2\text{e (g)} = \text{Facility Energy (kWh)} \times \text{Grid Carbo
    ```
    Open `http://localhost:8080` in your browser.
 
-3. Build the application:
+3. Build the application for production:
    ```bash
    npm run build
    ```
-
----
-
-## References
-- **Energy Estimations:** *Jegham et al. (2025) "How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference."*
-- **Water Footprint Estimations:** *Li et al. (2023) "Making AI Less 'Thirsty': Uncovering and Addressing the Secret Water Footprint of AI Models."*
