@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { CarbonInputs, CarbonCategoryBreakdown, RecommendationAction } from "./carbon-tracker";
+import { getFallbackActions } from "./fallback-actions";
 
 // The API key should be provided via environment variables (e.g. .env file)
 const API_KEY = process.env.GEMINI_API_KEY || "";
@@ -51,8 +52,7 @@ export const generatePersonalizedActions = createServerFn({ method: "POST" })
       const actions: RecommendationAction[] = JSON.parse(text);
       return actions.slice(0, 4); // ensure max 4
     } catch (e) {
-      console.error("Gemini API Error:", e);
-      // Fallback to empty if it fails
-      return [];
+      console.error("Gemini API Error. Falling back to rule-based actions:", e);
+      return getFallbackActions(typedData.inputs);
     }
   });

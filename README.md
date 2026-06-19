@@ -1,15 +1,16 @@
 # EcoMetrics.ai — Personal & AI Carbon Footprint Calculator
 
-EcoMetrics.ai is a comprehensive, privacy-first carbon calculation engine designed to help users track and reduce their carbon footprint. The application provides localized, science-backed environmental analytics for daily lifestyle choices (transport, energy, diet, shopping) alongside detailed environmental impact benchmarking for Large Language Models (LLMs).
-
-While our primary focus is on robust **Carbon Calculation** and actionable emission reductions, the application also includes multidimensional benchmarking for AI models—calculating financial costs, latency, water usage, and energy overhead as secondary metrics.
-
-### Why AI Metrics?
-In a world where everyone is rapidly adopting and using Large Language Models (LLMs) daily, very few people are aware of the hidden, actual costs of generating responses. Beyond financial API costs, two of the most significant and often invisible environmental impacts of AI are its massive carbon footprint and extensive water usage for cooling data centers. EcoMetrics.ai sheds light on these invisible costs so developers and consumers can make eco-conscious model choices.
+**EcoMetrics.ai** is a comprehensive, privacy-first carbon calculation engine designed to help users track and reduce their carbon footprint. The application provides localized, science-backed environmental analytics for daily lifestyle choices (transport, energy, diet, shopping) alongside detailed environmental impact benchmarking for Large Language Models (LLMs).
 
 ---
 
-## 🌍 Core Features
+## 🚀 Deployed Link
+You can access the live, production-ready application hosted on Google Cloud Run here:
+**[https://ecometrics-677478303886.us-central1.run.app](https://ecometrics-677478303886.us-central1.run.app)**
+
+---
+
+## 💡 Use of this Application
 
 ### 1. Personal Carbon Tracker
 A personalized assessment engine that calculates an individual's carbon footprint across four key sectors:
@@ -17,22 +18,115 @@ A personalized assessment engine that calculates an individual's carbon footprin
 - **Energy:** Domestic electricity consumption scaled by household size.
 - **Diet:** Dietary choices ranging from heavy meat consumption to vegan.
 - **Shopping:** Monthly expenditure converted to carbon equivalents.
-- **AI Recommendations:** Context-aware, personalized emission reduction actions generated using Gemini 2.5 Flash.
 
 ### 2. AI Model Benchmarking
-Compare the environmental and financial costs of queries across Frontier and Small Language Models:
+In a world where everyone is rapidly adopting LLMs, few people are aware of the hidden costs. This app compares the environmental and financial costs of queries across Frontier and Small Language Models:
 - **Carbon Emissions (g CO₂e):** Datacenter electricity draw mapped to grid carbon intensity.
 - **Energy (Wh):** Empirical hardware-level energy estimates.
 - **Water Footprint (mL):** Scope-1 (cooling) and Scope-2 (power-generation) water footprint models.
-- **Financial Cost (USD) & Latency:** (Secondary) Calculated per million tokens and time-to-first-token (TTFT).
+- **Financial Cost (USD) & Latency:** Calculated per million tokens and time-to-first-token (TTFT).
 
 ---
 
-## 🔬 Calculation Methodology & References
+## 🛠 Tech Stack Used
 
-The calculator avoids mocked data and relies on strictly extracted numbers from official academic and government reports.
+### Frontend & Core
+- **Framework:** React 19, TypeScript
+- **Routing & SSR:** TanStack Start
+- **Styling:** TailwindCSS
+- **Visualizations:** Recharts
+- **Bundler:** Vite
 
-### References
+### Backend & Cloud Infrastructure
+- **Server:** Custom Node.js production server (`server-prod.js`)
+- **Database:** Google Cloud Firestore (via `@google-cloud/firestore` for anonymous history tracking)
+- **AI Advisor Backend:** Google Generative AI (`gemini-2.5-flash`)
+- **Deployment:** Docker & Google Cloud Run (Serverless)
+- **Security:** GCP Secret Manager for API Keys
+
+### Testing Framework
+- **Unit Testing:** Vitest
+
+---
+
+## 🔄 Flow and Logic
+
+1. **User Input:** The user fills out a 4-step wizard (Transport, Energy, Diet, Shopping).
+2. **Calculation Engine:** The backend crunches the raw inputs using strict GHG conversion factors.
+3. **Database Sync:** The application generates a persistent, anonymous `userId` locally, and asynchronously triggers a secure backend API call to sync the detailed footprint payload to Google Cloud **Firestore**.
+4. **AI/Rule-Based Action Generation:** 
+   - The app asks Gemini (`gemini-2.5-flash`) to generate 4 highly personalized, actionable steps based on the math.
+   - **Fallback Logic:** If the AI API times out, fails, or hits a rate limit, a deterministic `fallback-actions.ts` engine instantly intercepts the error and routes the data through hardcoded rules (e.g., if `carMilesPerWeek > 100`, recommend an EV), guaranteeing the user never sees an empty screen.
+5. **Display:** The user views their total footprint, an A-F grade based on Paris 2030 targets, and their recommended actions.
+
+---
+
+## 📂 Project Layout
+
+```text
+token-extractor/
+├── src/
+│   ├── components/      # Reusable React UI components (Charts, Forms)
+│   ├── lib/             # Core logic & utilities
+│   │   ├── carbon-tracker.ts       # Mathematical calculation engine
+│   │   ├── carbon-tracker.test.ts  # Vitest unit tests for calculations
+│   │   ├── fallback-actions.ts     # Deterministic AI-fallback rules
+│   │   ├── firestore.ts            # Server-side GCP Firestore logic
+│   │   ├── gemini.ts               # Google Generative AI integration
+│   │   └── factors.json            # Base conversion factors & metrics
+│   ├── routes/          # TanStack file-based routing
+│   │   ├── index.tsx                 # Landing Page
+│   │   ├── carbon-tracker.tsx        # Footprint Calculator Page
+│   │   └── llm-benchmarks.tsx        # LLM Comparison Page
+│   └── start.ts         # TanStack Server Entry
+├── server-prod.js       # Custom Node.js static asset server (Path Traversal protected)
+├── Dockerfile           # Multi-stage Docker build for GCP deployment
+├── package.json         # Dependencies & scripts
+└── README.md            # You are here!
+```
+
+---
+
+## 🔌 Key Endpoints Description
+
+As a TanStack Start SSR application, API logic is heavily integrated as Server Functions (`createServerFn`), meaning the frontend can securely call backend code without traditional REST boilerplate. 
+
+- `POST /_serverFn/generatePersonalizedActions`
+  - **Description:** Accepts the mathematical `CarbonResult` and prompts `gemini-2.5-flash` to generate 4 actionable reduction steps. Implements a secure fallback mechanism to `fallback-actions.ts` on failure.
+- `POST /_serverFn/syncHistoryToCloud`
+  - **Description:** Secures a connection to Firestore using the default GCP service account, writing the footprint data, inputs, and timestamp to a `user_history` collection under an anonymous `userId`.
+
+---
+
+## 🤔 Assumptions
+
+- **Grid Carbon Intensity:** Assumes an average carbon intensity for electricity based on UK/India government reports, rather than tracking real-time local grid fluctuations.
+- **Flight Data:** Uses a flat multiplier mapping (assuming average short-to-medium haul flight lengths) rather than asking the user for exact geographic destinations.
+- **Anonymity over Authentication:** Assumes the user prefers privacy; instead of forcing an OAuth login, the app uses a persistent, anonymous `localStorage` UUID to tie documents together in Firestore.
+
+---
+
+## 🧪 How We Tested
+
+### Security & Audits
+- **Path Traversal Patch:** Conducted a security audit on `server-prod.js` and replaced a naive regex with `path.resolve` and strict prefix validation to completely neutralize directory traversal attacks on static asset requests.
+- **Secret Management:** Hardcoded keys were scrubbed from Git history, `.env` protection was enforced, and the production Gemini API key is securely injected at runtime via **GCP Secret Manager**.
+
+### Unit Testing
+The complex mathematics driving the four environmental pillars are strictly evaluated using the **Vitest** testing framework.
+
+To execute the test suite locally:
+```bash
+npx vitest run
+```
+*Note: The unit tests specifically validate that edge cases (like 0 inputs or extreme flight multipliers) generate exactly the correct grading outputs and total Kg.*
+
+---
+
+## 📖 References
+
+The calculator avoids mocked data and relies on strictly extracted numbers from official academic and government reports:
+
 1. **UK Government GHG Conversion Factors (2026):**
    - Official baseline for electricity (`0.13096 kg CO₂e / kWh`), passenger vehicles (`0.27785 kg CO₂e / mile`), and business travel air (`0.14253 kg CO₂e / km`).
    - Source: *UK Government GHG Conversion Factors for Company Reporting (DEFRA).*
@@ -49,45 +143,8 @@ The calculator avoids mocked data and relies on strictly extracted numbers from 
    - **Energy Estimations:** *Jegham et al. (2025) "How Hungry is AI? Benchmarking Energy, Water, and Carbon Footprint of LLM Inference."*
    - **Water Footprint Estimations:** *Li et al. (2023) "Making AI Less 'Thirsty': Uncovering and Addressing the Secret Water Footprint of AI Models."*
 
-### Key Formulas
-- **Personal Footprint (e.g. Energy):** 
-  $$\text{Energy Carbon} = \frac{\text{kWh} \times 12}{\text{Household Size}} \times 0.13096 \text{ kg CO₂e/kWh}$$
-- **AI Carbon Footprint:**
-  $$\text{CO}_2\text{e (g)} = \text{Total Tokens} \times \text{Energy Per Token} \times \text{PUE} \times \text{Grid Carbon Intensity}$$
-
 ---
 
-## 🛠 Technology Stack
-
-- **Core Framework:** React 19, TypeScript
-- **Routing & SSR:** TanStack Start
-- **Styling:** TailwindCSS
-- **Charts:** Recharts
-- **Bundler:** Vite
-- **AI Advisor Backend:** Google Generative AI (`gemini-2.5-flash`)
-
----
-
-## 🚀 Local Setup
-
-### Prerequisites
-- Node.js (v20.19.0+ or v22.12.0+)
-- npm (v10.0.0+)
-
-### Steps
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the local development server:
-   ```bash
-   npm run dev
-   ```
-   Open `http://localhost:8080` in your browser.
-
-3. Build the application for production:
-   ```bash
-   npm run build
-   ```
+## 📌 Key Points
+- **Memory Optimized:** The `GoogleGenerativeAI` client is hoisted to the global server scope to prevent repeated memory allocations per request, minimizing Time-To-First-Token.
+- **Fail-Safe Design:** If the Google AI goes down, the application will not break; the deterministic rule engine ensures users always walk away with actionable advice.

@@ -44,8 +44,10 @@ function CarbonTrackerPage() {
     } else {
       const res = calculateCarbon(inputs);
       setResult(res);
-      saveToHistory(inputs, res.totalKg);
+      saveToHistory(inputs, res);
       setHistory(loadHistory());
+      
+      // Attempt to generate personalized actions asynchronously
       setIsComplete(true);
       setIsGenerating(true);
       

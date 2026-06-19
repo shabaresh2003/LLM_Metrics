@@ -118,21 +118,41 @@ export function calculateCarbon(inputs: CarbonInputs): CarbonResult {
 
 
 
+import { syncHistoryToCloud } from "./firestore";
+
 /**
  * LocalStorage management
  */
-export function saveToHistory(inputs: CarbonInputs, totalKg: number) {
+export function saveToHistory(inputs: CarbonInputs, result: CarbonResult) {
   if (typeof window === "undefined") return;
   const entry: HistoryEntry = {
     id: Date.now().toString(),
     date: new Date().toISOString(),
-    totalKg,
+    totalKg: result.totalKg,
     inputs
   };
   
   const history = loadHistory();
   history.push(entry);
   localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
+
+  // Sync to Cloud Firestore asynchronously
+  let userId = localStorage.getItem("ecometrics_user_id");
+  if (!userId) {
+    userId = "user_" + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem("ecometrics_user_id", userId);
+  }
+
+  syncHistoryToCloud({
+    data: {
+      userId,
+      totalKg: result.totalKg,
+      inputs,
+      breakdown: result.breakdown,
+      grade: result.grade,
+      timestamp: entry.date,
+    }
+  }).catch(err => console.error("Cloud sync trigger failed:", err));
 }
 
 export function loadHistory(): HistoryEntry[] {
