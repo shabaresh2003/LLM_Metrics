@@ -7,8 +7,8 @@ import type { CarbonInputs, CarbonCategoryBreakdown } from "./carbon-tracker";
 // Locally, you must run `gcloud auth application-default login`
 const db = new Firestore();
 
-export const syncHistoryToCloud = createServerFn({ method: "POST" }).handler(
-  async ({ data }: { data: unknown }) => {
+export const syncHistoryToCloud = createServerFn({ method: "POST" })
+  .handler(async ({ data }: { data: unknown }) => {
     const typedData = data as {
       userId: string;
       totalKg: number;

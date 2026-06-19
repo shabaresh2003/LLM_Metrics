@@ -152,6 +152,7 @@ export function saveToHistory(inputs: CarbonInputs, result: CarbonResult) {
   }
 
   syncHistoryToCloud({
+    // @ts-ignore
     data: {
       userId,
       totalKg: result.totalKg,
@@ -160,7 +161,7 @@ export function saveToHistory(inputs: CarbonInputs, result: CarbonResult) {
       grade: result.grade,
       timestamp: entry.date,
     },
-  }).catch((err) => console.error("Cloud sync trigger failed:", err));
+  }).catch((err: unknown) => console.error("Cloud sync trigger failed:", err));
 }
 
 export function loadHistory(): HistoryEntry[] {

@@ -11,8 +11,8 @@ const genAI = new GoogleGenerativeAI(API_KEY);
 // We will use gemini-2.5-flash for fast and reliable responses
 const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-export const generatePersonalizedActions = createServerFn({ method: "POST" }).handler(
-  async ({ data }: { data: unknown }) => {
+export const generatePersonalizedActions = createServerFn({ method: "POST" })
+  .handler(async ({ data }: { data: unknown }) => {
     const typedData = data as {
       inputs: CarbonInputs;
       breakdown: CarbonCategoryBreakdown;

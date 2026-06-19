@@ -1,9 +1,9 @@
 import { describe, it, expect } from "vitest";
-import { calculateCarbon } from "./carbon-tracker";
+import { calculateCarbon, CarbonInputs, DietType } from "./carbon-tracker";
 
 describe("calculateCarbon", () => {
   it("should correctly calculate the carbon footprint for a typical user", () => {
-    const inputs = {
+    const inputs: CarbonInputs = {
       transport: {
         carMilesPerWeek: 100,
         flightsPerYear: 2,
@@ -48,8 +48,32 @@ describe("calculateCarbon", () => {
     expect(result.grade).toBe("B");
   });
 
+  it("should calculate footprint correctly for a heavy meat eater who drives a lot", () => {
+    const inputs: CarbonInputs = {
+      transport: { carMilesPerWeek: 200, flightsPerYear: 3 },
+      energy: { electricityKwhPerMonth: 500, peopleInHousehold: 1 },
+      diet: { dietType: "meat_heavy" },
+      shopping: { shoppingSpendPerMonth: 1000 }, // ~12k USD/year -> maybe massive footprint
+    };
+    const result = calculateCarbon(inputs);
+    expect(result.totalKg).toBeGreaterThan(5000);
+    // Grade F is highly likely for 5000+ kg
+  });
+
+  it("should calculate footprint for an eco-friendly user", () => {
+    const inputs: CarbonInputs = {
+      transport: { carMilesPerWeek: 0, flightsPerYear: 0 },
+      energy: { electricityKwhPerMonth: 150, peopleInHousehold: 2 },
+      diet: { dietType: "vegan" },
+      shopping: { shoppingSpendPerMonth: 100 },
+    };
+    const result = calculateCarbon(inputs);
+    expect(result.totalKg).toBeLessThan(3000);
+    expect(result.grade).toMatch(/A|B/);
+  });
+
   it("should return 0 footprint for zero inputs", () => {
-    const inputs = {
+    const inputs: CarbonInputs = {
       transport: { carMilesPerWeek: 0, flightsPerYear: 0 },
       energy: { electricityKwhPerMonth: 0, peopleInHousehold: 1 },
       diet: { dietType: "vegan" }, // vegan still has a base footprint

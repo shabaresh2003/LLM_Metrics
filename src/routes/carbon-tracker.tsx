@@ -98,6 +98,7 @@ function CarbonTrackerPage() {
 
       try {
         const dynamicActions = await generatePersonalizedActions({
+          // @ts-ignore
           data: { inputs, breakdown: res.breakdown, totalKg: res.totalKg },
         });
         setResult((prev) => (prev ? { ...prev, actions: dynamicActions } : null));

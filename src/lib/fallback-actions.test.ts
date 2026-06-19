@@ -4,10 +4,10 @@ import type { CarbonInputs } from "./carbon-tracker";
 
 describe("fallback-actions.ts", () => {
   const baseInputs: CarbonInputs = {
-    transport: { carMilesPerWeek: 0, mpg: 25, publicTransitMilesPerWeek: 0, flightsPerYear: 0 },
+    transport: { carMilesPerWeek: 0, flightsPerYear: 0 },
     energy: { electricityKwhPerMonth: 0, peopleInHousehold: 1 },
-    diet: { dietType: "vegan", localFoodPercentage: 100 },
-    shopping: { shoppingSpendPerMonth: 0, usesSecondHand: true },
+    diet: { dietType: "vegan" },
+    shopping: { shoppingSpendPerMonth: 0 },
   };
 
   it("should return EV/carpool action if driving miles are high", () => {
